@@ -3,6 +3,10 @@ from sqlalchemy.orm import Session
 from app.database import get_db, Base, engine
 from app.schemas import AssignmentCreate, AssignmentUpdate, AssignmentResponse
 from app.models import Assignment
+from pydantic import BaseModel
+
+# Please run this command to run the backend api:
+# python -m uvicorn app.main:app --reload
 
 Base.metadata.create_all(bind=engine)
 
