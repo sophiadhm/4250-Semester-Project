@@ -1,0 +1,10 @@
+# these are the modules we are using in our project
+#please open the terminal and run this command:
+# pip install -r requirements.txt
+
+fastapi
+uvicorn
+sqlalchemy
+pydantic
+flask
+requests
