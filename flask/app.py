@@ -5,7 +5,7 @@ app = Flask(__name__)
 app.secret_key = 'key'
 
 
-URL = ''
+URL = 'http://127.0.0.1:8000'
 
 
 
