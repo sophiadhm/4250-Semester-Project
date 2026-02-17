@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h1 class="page-title">Calendrier - Assingment Tracker</h1>
+
+<form method="GET" action="/" class="search-bar">
+
+</form>
+<div class="grids-holder">
+    <div class="grid-container">
+        {% for #class in #CLASSES %}
+        <div class="product-card">
+            <h3>{{ product['product_name'] }}</h3>
+            <p class="type">{{ #CLASSES }}</p>
+
+            <a class="details-btn" href="{{ url_for()}}">
+                View Details
+            </a>
+
+            <a class="edit-btn" href="{{ url_for() }}">
+                Edit
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
