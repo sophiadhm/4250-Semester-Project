@@ -7,4 +7,5 @@ uvicorn
 sqlalchemy
 pydantic
 flask
+flask-login
 requests

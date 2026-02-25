@@ -1,0 +1,30 @@
+/* ==================
+#C5E7DF (Frozen Water)
+#2F3061 (Twilight Indigo)
+#517664 (Deep Teal)
+#382619 (Dark Coffee)
+======================*/
+
+/* UI mapping */
+--bg:#f7fbfa;            /* soft background */
+--surface: #ffffff;          /* cards */
+--text: var(--c-coffee);     /* primary text */
+--muted: #6b6b6b;            /* secondary text */
+--border: rgba(47, 48, 97, 0.14);
+
+--primary: var(--c-indigo);  /* main CTA */
+--primary-hover: #242550;
+
+--accent: var(--c-teal);     /* secondary CTA */
+--accent-hover: #3f5e52;
+
+--highlight: var(--c-mint);  /* subtle highlight */
+
+/* Shape + shadow */
+  --radius: 14px;
+  --radius-sm: 10px;
+  --shadow: 0 10px 30px rgba(56, 38, 25, 0.10);
+
+  /* Type */
+  --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Helvetica Neue", sans-serif;
+}
