@@ -1,8 +1,19 @@
+import sys
+import os
+
+# Automatically find the project root (the folder containing both 'app' and 'flask_application')
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+
+# Add it to Python's module search path
+if project_root not in sys.path:
+    sys.path.append(project_root)
+
+
 from flask import Flask, render_template, request, flash, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from app.models import db, User, Assignment
-from decorators import admin_required
+from flask_application.decorators import admin_required
 import requests
 
 app = Flask(__name__)
