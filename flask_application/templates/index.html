@@ -1,7 +1,25 @@
 {% extends "base.html" %}
 {% block content %}
 
-<h1 class="page-title">Calendrier - Assingment Tracker</h1>
+<h1 class="page-title">Calendrier - Assignment Tracker</h1>
+
+<div class="assignments-section">
+    <div class="assignments-header">
+        <h2>Assignments</h2>
+        <button class="add-assignment-btn" onclick="window.location.href='/assignments/new'">Add New Assignment</button>
+    </div>
+    <ul class="assignments-list">
+        {% for assignment in assignments %}
+        <li class="assignment-item">
+            <!-- <span class="assignment-title">{{ assignment.title }}</span> -->
+            <!-- <span class="assignment-due">Due: {{ assignment.due_date }}</span> -->
+            <!-- <a href="/assignments/{{ assignment.id }}" class="view-details-btn">View Details</a> --> 
+        </li>
+        {% else %}
+        <li>No assignments found.</li>
+        {% endfor %}
+    </ul>
+</div>
 
 <form method="GET" action="/" class="search-bar">
 

@@ -27,4 +27,99 @@
 
   /* Type */
   --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Helvetica Neue", sans-serif;
+
+.navbar {
+    background: #2F3061;
+    color: #fff;
+    padding: 1rem 2rem;
+    box-shadow: 0 2px 8px rgba(47,48,97,0.08);
+}
+.navbar-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.navbar-brand {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #fff;
+    text-decoration: none;
+}
+.navbar-menu {
+    list-style: none;
+    display: flex;
+    gap: 1.5rem;
+    margin: 0;
+    padding: 0;
+}
+.navbar-menu li a {
+    color: #fff;
+    text-decoration: none;
+    font-size: 1rem;
+    transition: color 0.2s;
+}
+.navbar-menu li a:hover {
+    color: #C5E7DF;
+}
+
+.assignments-section {
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 4px 16px rgba(47,48,97,0.08);
+    padding: 2rem;
+    margin: 2rem auto;
+    max-width: 700px;
+}
+.assignments-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+.add-assignment-btn {
+    background: #517664;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 0.5rem 1.2rem;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.add-assignment-btn:hover {
+    background: #382619;
+}
+.assignments-list {
+    list-style: none;
+    padding: 0;
+}
+.assignment-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.8rem 0;
+    border-bottom: 1px solid #eee;
+}
+.assignment-title {
+    font-weight: bold;
+    color: #2F3061;
+}
+.assignment-due {
+    color: #517664;
+    margin-left: 1rem;
+}
+.view-details-btn {
+    background: #C5E7DF;
+    color: #2F3061;
+    border: none;
+    border-radius: 8px;
+    padding: 0.3rem 0.8rem;
+    text-decoration: none;
+    font-size: 0.95rem;
+    margin-left: 1rem;
+    transition: background 0.2s;
+}
+.view-details-btn:hover {
+    background: #2F3061;
+    color: #fff;
 }

@@ -1,11 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
+
+
 <head>
     <title>{% block title %}Calendrier{% endblock %}</title>
-
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css')}}">
     
 </head>
 <body>
     
+<body>
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="/" class="navbar-brand">Assignment Tracker</a>
+            <ul class="navbar-menu">
+                <li><a href="/">Home</a></li>
+                <li><a href="/calendar">Calendar</a></li>
+                <li><a href="/assignments">Assignments</a></li>
+            </ul>
+        </div>
+    </nav>
+    {% block content %}{% endblock %}
 </body>
-</html>
