@@ -13,7 +13,7 @@ class User(UserMixin, db.Model):
     password_hash = db.Column(db.String(150), nullable=False)
     is_admin = db.Column(db.Boolean, default=False)
 
-    def set_password(self, password):
+    def set_password(self, password):        
         self.password_hash = generate_password_hash(password)
         
     def check_password(self, password):
