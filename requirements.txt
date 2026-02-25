@@ -9,3 +9,4 @@ pydantic
 flask
 flask-login
 requests
+decorators
