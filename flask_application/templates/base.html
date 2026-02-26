@@ -3,9 +3,12 @@
 
 
 <head>
-    <title>{% block title %}Calendrier{% endblock %}</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css')}}">
-    
+    <div class="heading-container">
+        <img src="/static/images/logo.png" alt="Home icon" class="icon-img">
+        <title>{% block title %}Calendrier{% endblock %}</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='style.css')}}">
+        <link rel="icon" type="image/x-icon" href="/static/images/logo.png">
+    </div>
 </head>
 <body>
     
