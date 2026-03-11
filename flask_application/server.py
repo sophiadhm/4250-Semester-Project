@@ -99,10 +99,14 @@ def logout():
 # Home page
 @app.route('/')
 def index():
-    response = requests.get(f'{URL}/assignments/')
-    assignments = response.json()
-    return render_template('index.html', assignments=assignments)
+    #response = requests.get(f'{URL}/assignments/')
+    #assignments = response.json()
+    return render_template('index.html')#, assignments=assignments)
 
+# Calendar page route
+@app.route("/calendar/")
+def about():
+    return render_template("calendar.html")
 
 if __name__ == '__main__':
     app.run(debug=True)
