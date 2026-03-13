@@ -19,24 +19,23 @@ class User(UserMixin, db.Model):
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
     
-class Assignment(Base):
+class Assignment(db.Model):
     __tablename__ = "assignments"
 
-    id = Column(Integer, primary_key=True, index=True)
-
-    course_id = Column(String(4), nullable=False)
-
+    id = db.Column(db.Integer, primary_key=True, index=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    course_id = db.Column(db.String(4), nullable=False)
     __table_args__ = (
-        CheckConstraint(
+        db.CheckConstraint(
             "course_id GLOB '[0-9][0-9][0-9][0-9]'",
             name="course_id_must_be_4_digits"
         ),
     )
 
-    name = Column(String, index=True)
-    course = Column(String)
-    due_date = Column(String)
-    due_time = Column(String)
+    name = db.Column(db.String, index=True)
+    course = db.Column(db.String)
+    due_date = db.Column(db.String)
+    due_time = db.Column(db.String)
     assignment_type = Column(String)
     priority_level = Column(Integer)
     points = Column(Float)
