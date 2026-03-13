@@ -135,7 +135,7 @@ def sync():
 @app.route("/assignments/")
 @login_required
 def assignment():
-    assignments = Assignment.queryfilter_by(
+    assignments = Assignment.query.filter_by(
         user_id=current_user.id
     ).order_by(Assignment.due_date).all()
     return render_template("assignments.html", assignments=assignments)
