@@ -12,7 +12,7 @@ class User(UserMixin, db.Model):
     username = db.Column(db.String(150), unique=True, nullable=False)
     password_hash = db.Column(db.String(150), nullable=False)
     is_admin = db.Column(db.Boolean, default=False)
-
+    ics_url = db.Column(db.String(500))
     def set_password(self, password):        
         self.password_hash = generate_password_hash(password)
         
