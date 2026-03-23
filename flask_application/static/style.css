@@ -56,41 +56,56 @@ body{
 
 
 .navbar {
-  background: #2F3061;
-  padding: 1rem 2rem;
+    background-color: #2f2d6b;
+    padding: 0;
 }
 
 .navbar-container {
-  max-width: 1100px;
-  margin: 0 auto;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
 .navbar-brand {
-  font-size: 1.4rem;
-  font-weight: 700;
-  color: white;
-  text-decoration: none;
+    color: white;
+    text-decoration: none;
+    font-size: 1.8rem;
+    font-style: italic;
+    font-weight: bold;
+    margin-left: 12px;
+}
+
+.icon-img {
+    width: 36px;
+    height: 36px;
+    object-fit: contain;
+    display: block;
 }
 
 .navbar-menu {
-  list-style: none;
-  display: flex;
-  gap: 1.5rem;
+    list-style: none;
+    display: flex;
+    gap: 24px;
+    margin: 0;
+    padding: 0;
+    align-items: center;
 }
 
-.navbar-menu li a {
-  text-decoration: none;
-  color: white;
-  font-weight: 500;
-  transition: 0.2s;
+.navbar-menu a {
+    color: #C5E7DF;
+    text-decoration: none;
+    font-weight: 500;
+    font-style: italic;
 }
 
-.navbar-menu li a:hover {
-  color: #C5E7DF;
+.navbar-left {
+    display: flex;
+    align-items: center;
 }
+
 .assignments-section{
   padding: 1.25rem;
   margin: 1.5rem auto;
@@ -100,7 +115,7 @@ body{
   max-width: 1100px;
   margin: 18px auto 0;
   padding: 0 18px;
-
+  font-style: italic;
   display: flex;
   align-items: center;
   gap: 12px;
@@ -128,18 +143,20 @@ body{
 }
 
 .add-assignment-btn{
-  background: var(--accent);
+  background:#517664;
   color:#fff;
   border:none;
   border-radius: var(--radius-sm);
-  padding: .55rem 1.1rem;
-  font-size: 1rem;
-  font-weight: 700;
+  padding:.55rem 1.1rem;
+  font-size:1rem;
+  font-weight:700;
   cursor:pointer;
   transition: transform .05s, background .2s;
 }
 
-.add-assignment-btn:hover{ background: var(--accent-hover); }
+.add-assignment-btn:hover{
+  background:#3f5f50;
+}
 .add-assignment-btn:active{ transform: translateY(1px); }
 
 .assignment-item{

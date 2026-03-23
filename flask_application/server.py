@@ -15,6 +15,7 @@ from flask_login import LoginManager, login_user, login_required, logout_user, c
 from app.models import db, User, Assignment
 from flask_application.decorators import admin_required
 import requests
+from sync import sync_assignments
 
 app = Flask(__name__)
 app.secret_key = 'key'
@@ -81,7 +82,7 @@ def login():
         if user and user.check_password(password):
             login_user(user)
             flash("User logged in successfully!", "success")
-            return redirect(url_for('seeker_index'))
+            return redirect(url_for('index'))
 
         flash("Invalid username or password.", "error")
         return redirect(url_for("login"))
@@ -98,6 +99,7 @@ def logout():
 
 # Home page
 @app.route('/')
+@login_required
 def index():
     #response = requests.get(f'{URL}/assignments/')
     #assignments = response.json()
@@ -105,13 +107,38 @@ def index():
 
 # Calendar page route
 @app.route("/calendar/")
+@login_required
 def about():
     return render_template("calendar.html")
 
+
+#connect calendar route
+@app.route("/connect-calendar/", methods=["GET", "POST"])
+@login_required
+def connect_calendar():
+    ics_url = request.form.get["ics_url"]
+    current_user.ics_url = ics_url
+    db.session.commit()
+    flash("Calendar connected successfully!", "success")
+    return redirect(url_for("about"))
+
+#sync stuff
+@app.route("/sync/")
+@login_required
+def sync():
+    sync_assignments(current_user)
+    flash("Assignments synced successfully!", "success")
+    return redirect(url_for("assignment"))
+
+
 # Assignment page route
 @app.route("/assignments/")
+@login_required
 def assignment():
-    return render_template("assignments.html")
+    assignments = Assignment.query.filter_by(
+        user_id=current_user.id
+    ).order_by(Assignment.due_date).all()
+    return render_template("assignments.html", assignments=assignments)
 
 if __name__ == '__main__':
     app.run(debug=True)

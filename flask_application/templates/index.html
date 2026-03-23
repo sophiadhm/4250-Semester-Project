@@ -1,13 +1,13 @@
 {% extends "base.html" %}
 {% block content %}
+
 <div class="heading-container">
-<img src="/static/images/logo.png" alt="Home icon" class="icon-img">
-<h1 class="page-title">Calendrier - Assignment Tracker</h1>
+    <h3 class="page-title">Home</h3>
 </div>
 <div class="assignments-section">
     <div class="assignments-header">
-        <h2>Assignments</h2>
-        <button class="add-assignment-btn" onclick="window.location.href='/assignments/new'">Add New Assignment</button>
+        <h3>Add New Assignment</h2>
+        <button class="add-assignment-btn" onclick="window.location.href='/assignments/new'">+</button>
     </div>
     <ul class="assignments-list">
         {% for assignment in assignments %}

@@ -5,8 +5,7 @@
 
 {% block content %}
 <div class="heading-container">
-    <img src="/static/images/logo.png" alt="Home icon" class="icon-img">
-    <h1 class="page-title">Calendrier - Calendar Page</h1>
+    <h3 class="page-title">Calendar</h3>
 </div>
 
 <link rel="stylesheet" href="{{ url_for('static', filename='calendar.css') }}">
@@ -21,6 +20,30 @@
     <div class="cal-grid" id="calGrid"></div>
   </div>
 </div>
+
+
+<div class="calendar-connect">
+
+<h3>Connect your D2L Calendar</h3>
+
+<form method="POST" action="/connect-calendar">
+
+<input
+type="text"
+name="ics_url"
+placeholder="Paste your D2L calendar feed"
+required>
+
+<button type="submit">
+Connect Calendar
+</button>
+
+</form>
+
+<a href="/sync">Sync Assignments</a>
+
+</div>
+
 
 <script>
  // some js code for the calendar to get the functionality that we need for the calendar

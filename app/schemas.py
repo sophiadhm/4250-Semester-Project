@@ -7,6 +7,7 @@ CourseID = Annotated[
 ]
 
 class AssignmentBase(BaseModel):
+    user_id: int
     name: str
     course: str
     course_id: CourseID
@@ -22,6 +23,7 @@ class AssignmentCreate(AssignmentBase):
 
 
 class AssignmentUpdate(BaseModel):
+    user_id: int | None = None
     name: str | None = None
     course: str | None = None
     course_id: CourseID | None = None
