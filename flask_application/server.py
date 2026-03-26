@@ -124,7 +124,7 @@ def about():
 @app.route("/connect-calendar/", methods=["GET", "POST"])
 @login_required
 def connect_calendar():
-    ics_url = request.form.get["ics_url"]
+    ics_url = request.form.get("ics_url")
     current_user.ics_url = ics_url
     db.session.commit()
     flash("Calendar connected successfully!", "success")
