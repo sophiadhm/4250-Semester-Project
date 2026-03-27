@@ -58,26 +58,24 @@ def load_user(user_id):
 @login_required
 def account():
     if request.method == "POST":
-
-        #update password
-        new_password = request.form.get("new_password")
-
-    if new_password:
-        current_user.set_password(new_password)
-        db.session.commit()
-        flash("Password updated successfully!", "success")
-
-        #update ics url
+        new_password = request.form.get("password")
         ics_url = request.form.get("ics_url")
+
+        if new_password:
+            current_user.set_password(new_password)
 
         if ics_url:
             current_user.ics_url = ics_url
-            db.session.commit()
-            flash("Calendar URL updated successfully!", "success")
 
+        db.session.commit()
+        flash("Account updated!", "success")
         return redirect(url_for("account"))
-    
+
     return render_template("account.html")
+
+
+
+
 # 3 routes -- login, logout, register
 @app.route("/register", methods=["GET", "POST"])
 def register():
