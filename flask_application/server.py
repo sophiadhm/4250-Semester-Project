@@ -136,16 +136,21 @@ def index():
     return render_template('index.html', assignments=[])#, assignments=assignments)
 
 
-#Create new assignment form 
-@app.route("/assignments/new", methods=["GET", "POST"])
+@app.route("/assignments/new", methods=["POST"])
 def new_assignment():
-    if request.method == "POST":
-        title = request.form.get("name")
-        course = request.form.get("class")
-        due_date = request.form.get("due_date")
-        priority = request.form.get("priority")
+    data = {
+        "name": request.form.get("name"),
+        "course": request.form.get("course"),
+        "due_date": request.form.get("due_date"),
+        "priority_level": request.form.get("priority"),
+        "course_id": "0000",
+        "due_time": None,
+        "assignment_type": None,
+        "points": None
+    }
 
-        return redirect(url_for("index"))
+    requests.post("http://127.0.0.1:8000/assignments/", json=data)
+
     return redirect(url_for("index"))
 
 # Calendar page route
