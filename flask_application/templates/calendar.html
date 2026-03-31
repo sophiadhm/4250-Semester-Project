@@ -5,8 +5,7 @@
 
 {% block content %}
 <div class="heading-container">
-    <img src="/static/images/logo.png" alt="Home icon" class="icon-img">
-    <h1 class="page-title">Calendrier - Calendar Page</h1>
+    <h3 class="page-title">Calendar</h3>
 </div>
 
 <link rel="stylesheet" href="{{ url_for('static', filename='calendar.css') }}">
@@ -22,9 +21,46 @@
   </div>
 </div>
 
+
+<div class="calendar-connect">
+
+<h3>Connect your D2L Calendar</h3>
+
+<form method="POST" action="/connect-calendar">
+
+<input
+type="text"
+name="ics_url"
+placeholder="Paste your D2L calendar feed"
+required>
+
+<button type="submit">
+Connect Calendar
+</button>
+
+</form>
+
+<a href="/sync">Sync Assignments</a>
+
+</div>
+
+
+<div class="calendar-details" id="calendarDetails" style="margin:24px; border:1px solid #ccc; padding:12px; background:#fff; max-width: 760px;">
+  <h4>Selected day assignments</h4>
+  <ul id="assignmentList" style="list-style:none; padding-left:0;"></ul>
+</div>
+
 <script>
- // some js code for the calendar to get the functionality that we need for the calendar
-  // day of calendar info 
+  // This script renders the widget and filename injection for assignments.
+  var assignments = {{ assignments | tojson | safe }};
+  var eventsByDate = {};
+
+  assignments.forEach(function(a) {
+    if (!a.due_date) return;
+    if (!eventsByDate[a.due_date]) eventsByDate[a.due_date] = [];
+    eventsByDate[a.due_date].push(a);
+  });
+
   var days = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
   var months = ["January","February","March","April","May","June",
                 "July","August","September","October","November","December"];
@@ -33,78 +69,114 @@
   var selectedDate = null;
   var today = new Date();
 
-  // drawing the calendar here 
-  function drawCalendar() {
+  function formatDayKey(year, month, day) {
+    var y = year.toString();
+    var m = (month + 1).toString().padStart(2, '0');
+    var d = day.toString().padStart(2, '0');
+    return y + '-' + m + '-' + d;
+  }
 
+  function renderAssignmentList(dateKey) {
+    var container = document.getElementById('assignmentList');
+    container.innerHTML = '';
+
+    var items = eventsByDate[dateKey] || [];
+    if (items.length === 0) {
+      container.innerHTML = '<li>No assignments for this date.</li>';
+      return;
+    }
+
+    items.sort(function(a, b) {
+      return (a.due_time || '') > (b.due_time || '') ? 1 : -1;
+    });
+
+    items.forEach(function(item) {
+      var li = document.createElement('li');
+      li.style.padding = '8px 0';
+      li.innerHTML = '<strong>' + (item.name || 'Untitled') + '</strong> (' + (item.course || 'N/A') + ') ' +
+        '<br>Due: ' + (item.due_date || 'N/A') + ' ' + (item.due_time || 'N/A') +
+        '<br>Type: ' + (item.assignment_type || 'N/A') + ' • Priority: ' + (item.priority_level || 'N/A') +
+        ' • Points: ' + (item.points || 'N/A');
+      container.appendChild(li);
+    });
+  }
+
+  function drawCalendar() {
     var year = currentDate.getFullYear();
     var month = currentDate.getMonth();
 
-    // showing what month and year it is 
-    document.getElementById("calTitle").textContent =
-        months[month] + " " + year;
+    document.getElementById('calTitle').textContent = months[month] + ' ' + year;
 
-    var grid = document.getElementById("calGrid");
-    grid.innerHTML = "";
+    var grid = document.getElementById('calGrid');
+    grid.innerHTML = '';
 
-    // showing the day labels 
     for (var i = 0; i < days.length; i++) {
-      var label = document.createElement("div");
-      label.className = "cal-day-label";
+      var label = document.createElement('div');
+      label.className = 'cal-day-label';
       label.textContent = days[i];
       grid.appendChild(label);
     }
 
-    // finding the first day and number of days in month
     var firstDay = new Date(year, month, 1).getDay();
     var daysInMonth = new Date(year, month + 1, 0).getDate();
 
     for (var i = 0; i < firstDay; i++) {
-      var empty = document.createElement("div");
-      empty.className = "cal-day empty";
+      var empty = document.createElement('div');
+      empty.className = 'cal-day empty';
       grid.appendChild(empty);
     }
 
-    // creating the days 
-    // used some AI here on the help of setting this some for styling purposes
     for (var d = 1; d <= daysInMonth; d++) {
-
-      var dayBox = document.createElement("div");
-      dayBox.className = "cal-day";
+      var dayBox = document.createElement('div');
+      dayBox.className = 'cal-day';
       dayBox.textContent = d;
 
-      // checking what day 
-      if (d == today.getDate() &&
-          month == today.getMonth() &&
-          year == today.getFullYear()) {
-
-          dayBox.classList.add("today");
+      if (d === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
+        dayBox.classList.add('today');
       }
 
-      // event for selecting date
-      dayBox.addEventListener("click", function() {
-          selectedDate = this.textContent;
-          drawCalendar();
+      var dayKey = formatDayKey(year, month, d);
+      if (eventsByDate[dayKey]) {
+        dayBox.classList.add('has-event');
+        var dot = document.createElement('span');
+        dot.className = 'event-dot';
+        dot.textContent = '•';
+        dayBox.appendChild(dot);
+      }
+
+      dayBox.addEventListener('click', function() {
+        // remove existing selected state
+        var previous = document.querySelector('.cal-day.selected');
+        if (previous) previous.classList.remove('selected');
+
+        // apply selected state and track selected date
+        this.classList.add('selected');
+        selectedDate = this.textContent;
+
+        var selectedKey = formatDayKey(year, month, parseInt(this.textContent, 10));
+        renderAssignmentList(selectedKey);
       });
 
       grid.appendChild(dayBox);
     }
+
+    if (!selectedDate) {
+      var todayKey = formatDayKey(today.getFullYear(), today.getMonth(), today.getDate());
+      renderAssignmentList(todayKey);
+    }
   }
 
-  // previous month button
-  document.getElementById("prevBtn").addEventListener("click", function() {
-      currentDate.setMonth(currentDate.getMonth() - 1);
-      drawCalendar();
+  document.getElementById('prevBtn').addEventListener('click', function() {
+    currentDate.setMonth(currentDate.getMonth() - 1);
+    drawCalendar();
   });
 
-  // next month button
-  document.getElementById("nextBtn").addEventListener("click", function() {
-      currentDate.setMonth(currentDate.getMonth() + 1);
-      drawCalendar();
+  document.getElementById('nextBtn').addEventListener('click', function() {
+    currentDate.setMonth(currentDate.getMonth() + 1);
+    drawCalendar();
   });
 
-  // running calendar when page loads
   drawCalendar();
-
 </script>
 
 </body>

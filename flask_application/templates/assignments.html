@@ -3,11 +3,43 @@
 {% block title %}ASSIGNMENTS{% endblock %}
 
 {% block content %}
+
 <div class="heading-container">
-    <img src="/static/images/logo.png" alt="Home icon" class="icon-img">
-    <h1 class="page-title">Calendrier - Assignment Page</h1>
+    <h3 class="page-title">Assignment Page</h3>
 </div>
+
 <div class="assignments-section">
-        <h2 class="assignments-header"> This page is dedicated to the assignments.</h2>
+
+    <h2 class="assignments-header">
+        This page is dedicated to the assignments.
+    </h2>
+
+    <a href="/sync">Sync D2L Assignments</a>
+
+    <div class="assignment-list">
+
+        {% if assignments %}
+
+            {% for assignment in assignments %}
+
+                <div class="assignment-card">
+                    <h3>{{ assignment.name }}</h3>
+                    <p><strong>Course:</strong> {{ assignment.course or 'None' }} ({{ assignment.course_id }})</p>
+                    <p><strong>Due date:</strong> {{ assignment.due_date }} <strong>Time:</strong> {{ assignment.due_time or 'N/A' }}</p>
+                    <p><strong>Type:</strong> {{ assignment.assignment_type or 'N/A' }} | <strong>Priority:</strong> {{ assignment.priority_level or 'N/A' }}</p>
+                    <p><strong>Points:</strong> {{ assignment.points or 'N/A' }}</p>
+                </div>
+
+            {% endfor %}
+
+        {% else %}
+
+            <p>No assignments found.</p>
+
+        {% endif %}
+
+    </div>
+
 </div>
+
 {% endblock %}

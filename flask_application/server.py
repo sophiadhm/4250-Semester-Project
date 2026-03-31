@@ -15,6 +15,8 @@ from flask_login import LoginManager, login_user, login_required, logout_user, c
 from app.models import db, User, Assignment
 from flask_application.decorators import admin_required
 import requests
+from sqlalchemy import text
+from sync import sync_assignments
 
 app = Flask(__name__)
 app.secret_key = 'key'
@@ -31,6 +33,13 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db.init_app(app) 
 with app.app_context():
     db.create_all()
+    # create_all will not add new columns to existing tables, so patch schema if needed
+    assignment_cols = db.session.execute(text("PRAGMA table_info(assignments)")).fetchall()
+    assignment_col_names = {col[1] for col in assignment_cols}
+    # if the user id is not in the assignment columns then we are going to add it 
+    if "user_id" not in assignment_col_names:
+        db.session.execute(text("ALTER TABLE assignments ADD COLUMN user_id INTEGER"))
+        db.session.commit()
 
 # set up login manager for aid with...logging in
 login_manager = LoginManager(app)
@@ -44,6 +53,28 @@ login_manager.login_message_category = 'error'
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
+
+@app.route("/account", methods=["GET", "POST"])
+@login_required
+def account():
+    if request.method == "POST":
+        new_password = request.form.get("password")
+        ics_url = request.form.get("ics_url")
+
+        if new_password:
+            current_user.set_password(new_password)
+
+        if ics_url:
+            current_user.ics_url = ics_url
+
+        db.session.commit()
+        flash("Account updated!", "success")
+        return redirect(url_for("account"))
+
+    return render_template("account.html")
+
+
+
 
 # 3 routes -- login, logout, register
 @app.route("/register", methods=["GET", "POST"])
@@ -81,7 +112,7 @@ def login():
         if user and user.check_password(password):
             login_user(user)
             flash("User logged in successfully!", "success")
-            return redirect(url_for('seeker_index'))
+            return redirect(url_for('index'))
 
         flash("Invalid username or password.", "error")
         return redirect(url_for("login"))
@@ -98,20 +129,79 @@ def logout():
 
 # Home page
 @app.route('/')
+@login_required
 def index():
     #response = requests.get(f'{URL}/assignments/')
     #assignments = response.json()
-    return render_template('index.html')#, assignments=assignments)
+    return render_template('index.html', assignments=[])#, assignments=assignments)
+
+
+@app.route("/assignments/new", methods=["POST"])
+def new_assignment():
+    data = {
+        "name": request.form.get("name"),
+        "course": request.form.get("course"),
+        "due_date": request.form.get("due_date"),
+        "priority_level": request.form.get("priority"),
+        "course_id": "0000",
+        "due_time": None,
+        "assignment_type": None,
+        "points": None
+    }
+
+    requests.post("http://127.0.0.1:8000/assignments/", json=data)
+
+    return redirect(url_for("index"))
 
 # Calendar page route
 @app.route("/calendar/")
+@login_required
 def about():
-    return render_template("calendar.html")
+    raw_assignments = Assignment.query.filter_by(user_id=current_user.id).all()
+    assignments = [
+        {
+            'id': a.id,
+            'name': a.name,
+            'course': a.course,
+            'course_id': a.course_id,
+            'due_date': a.due_date,
+            'due_time': a.due_time,
+            'assignment_type': a.assignment_type,
+            'priority_level': a.priority_level,
+            'points': a.points,
+        }
+        for a in raw_assignments
+    ]
+    return render_template("calendar.html", assignments=assignments)
+
+
+#connect calendar route
+@app.route("/connect-calendar/", methods=["GET", "POST"])
+@login_required
+def connect_calendar():
+    ics_url = request.form.get("ics_url")
+    current_user.ics_url = ics_url
+    db.session.commit()
+    flash("Calendar connected successfully!", "success")
+    return redirect(url_for("about"))
+
+#sync stuff
+@app.route("/sync/")
+@login_required
+def sync():
+    sync_assignments(current_user)
+    flash("Assignments synced successfully!", "success")
+    return redirect(url_for("assignment"))
+
 
 # Assignment page route
 @app.route("/assignments/")
+@login_required
 def assignment():
-    return render_template("assignments.html")
+    assignments = Assignment.query.filter_by(
+        user_id=current_user.id
+    ).order_by(Assignment.due_date).all()
+    return render_template("assignments.html", assignments=assignments)
 
 if __name__ == '__main__':
     app.run(debug=True)

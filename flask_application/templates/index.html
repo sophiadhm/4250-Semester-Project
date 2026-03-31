@@ -1,20 +1,21 @@
 {% extends "base.html" %}
 {% block content %}
+
 <div class="heading-container">
-<img src="/static/images/light-logo.png" alt="Home icon" class="icon-img">
-<h1 class="page-title">Assignment Tracker</h1>
+    <h3 class="page-title">Home</h3>
 </div>
+
 <div class="assignments-section">
     <div class="assignments-header">
         <h2>Add New Assignment</h2>
-        <button class="add-assignment-btn" onclick="window.location.href='/assignments/new'">+</button>
+        <button type="button" class="add-assignment-btn" id="openFormBtn">+</button>
     </div>
+
     <ul class="assignments-list">
         {% for assignment in assignments %}
         <li class="assignment-item">
-            <!-- <span class="assignment-title">{{ assignment.title }}</span> -->
-            <!-- <span class="assignment-due">Due: {{ assignment.due_date }}</span> -->
-            <!-- <a href="/assignments/{{ assignment.id }}" class="view-details-btn">View Details</a> --> 
+            <span class="assignment-title">{{ assignment.title }}</span>
+            <span class="assignment-due">Due: {{ assignment.due_date }}</span>
         </li>
         {% else %}
         <li>No assignments found.</li>
@@ -22,25 +23,56 @@
     </ul>
 </div>
 
-<form method="GET" action="/" class="search-bar">
+<div id="formOverlay" class="form-overlay hidden">
+    <div class="form-container">
+        <h3>Add New Assignment</h3>
 
-</form>
-<div class="grids-holder">
-    <div class="grid-container">
-        {% for class in CLASSES %}
-        <div class="product-card">
-            <h3>{{ product['product_name'] }}</h3>
-            <p class="type">{{ CLASSES }}</p>
+        <form method="POST" action="/assignments/new">
+            <label for="name">Assignment Name</label>
+            <input type="text" id="name" name="name" placeholder="Assignment Name" required>
 
-            <a class="details-btn" href="{{ url_for()}}">
-                View Details
-            </a>
+            <label for="course">Class</label>
+            <input type="text" id="course" name="course" required>
 
-            <a class="edit-btn" href="{{ url_for() }}">
-                Edit
-            </a>
-        </div>
-        {% endfor %}
+            <label for="due_date">Due Date</label>
+            <input type="date" id="due_date" name="due_date" required>
+
+            <label for="priority">Priority</label>
+            <select id="priority" name="priority" required>
+                <option value="">Select Priority</option>
+                <option value="1">1 (High)</option>
+                <option value="2">2 (Medium)</option>
+                <option value="3">3 (Low)</option>
+            </select>
+
+            <div class="form-buttons">
+                <button type="button" id="closeFormBtn" class="cancel-btn">Cancel</button>
+                <button type="submit" class="submit-btn">Submit</button>
+            </div>
+        </form>
     </div>
 </div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const openBtn = document.getElementById("openFormBtn");
+    const closeBtn = document.getElementById("closeFormBtn");
+    const overlay = document.getElementById("formOverlay");
+
+    openBtn.addEventListener("click", function () {
+        overlay.classList.remove("hidden");
+    });
+
+    closeBtn.addEventListener("click", function () {
+        overlay.classList.add("hidden");
+    });
+
+    overlay.addEventListener("click", function (e) {
+        if (e.target === overlay) {
+            overlay.classList.add("hidden");
+        }
+    });
+});
+</script>
+
 {% endblock %}

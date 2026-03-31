@@ -8,5 +8,6 @@ sqlalchemy
 pydantic
 flask
 flask-login
+ics
 requests
 decorators

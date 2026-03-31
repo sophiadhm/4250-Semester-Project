@@ -1,0 +1,40 @@
+
+{% extends 'base.html' %}
+
+{% block title %}Account{% endblock %}
+
+{% block content %}
+
+
+<h2>Account Settings</h2>
+
+<!-- Change Password -->
+<form method="POST">
+    <h3>Change Password</h3>
+    <input type="password" name="new_password" placeholder="New Password">
+    <button type="submit">Update Password</button>
+</form>
+
+<br>
+
+<!-- Add / Update ICS Link -->
+<form method="POST">
+    <h3>Connect D2L Calendar</h3>
+    <input type="text" name="ics_url" placeholder="Paste your ICS link here" value="{{ current_user.ics_url }}">
+    <button type="submit">Save Link</button>
+</form>
+
+<br>
+
+<!-- Logout -->
+<a href="{{ url_for('logout') }}">
+    <button>Log Out</button>
+</a>
+
+
+
+
+
+
+
+{% endblock %}

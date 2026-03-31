@@ -8,15 +8,21 @@
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='images/logo.png') }}">
 </head>
 <body>
-    <nav class="navbar">
-        <div class="navbar-container">
-            <a href="/" class="navbar-brand">Calendrier</a>
-            <ul class="navbar-menu">
-                <li><a href="/">Home</a></li>
-                <li><a href="/calendar">Calendar</a></li>
-                <li><a href="/assignments">Assignments</a></li>
-            </ul>
+<nav class="navbar">
+    <div class="navbar-container">
+        
+        <div class="navbar-left">
+            <img src="{{ url_for('static', filename='images/light-logo.png') }}" alt="Home icon" class="icon-img">
+            <a href="/" class="navbar-brand">Calendrier - Assignment Tracker</a>
         </div>
-    </nav>
+
+        <ul class="navbar-menu">
+            <li><a href="/">Home</a></li>
+            <li><a href="/calendar">Calendar</a></li>
+            <li><a href="/assignments">Assignments</a></li>
+            <li><a href="/account">Account</a></li>
+        </ul>
+    </div>
+</nav>
     {% block content %}{% endblock %}
 </body>

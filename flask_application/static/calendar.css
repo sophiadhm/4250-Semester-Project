@@ -19,7 +19,6 @@
   padding: 2rem;
   align-content: center;
   width: 70%;
-  /*max-width: 420px;*/
   box-shadow: var(--shadow);
   border: 1px solid var(--border);
 }
@@ -102,3 +101,18 @@
 }
 
 .cal-day.other-month { color: var(--border); }
+
+.cal-day.has-event {
+  position: relative;
+  padding-bottom: 1.25rem;
+}
+
+.event-dot {
+  color: var(--primary);
+  font-size: 1.2rem;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 0.15rem;
+  line-height: 1;
+}
