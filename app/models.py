@@ -23,6 +23,7 @@ class Assignment(db.Model):
     __tablename__ = "assignments"
     id = db.Column(db.Integer, primary_key=True, index=True)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    ics_uid = db.Column(db.String(255), nullable=True, index=True)
     course_id = db.Column(db.String(4), nullable=True, default="SYNC")
     name = db.Column(db.String, index=True)
     course = db.Column(db.String)

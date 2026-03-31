@@ -41,6 +41,11 @@ with app.app_context():
         db.session.execute(text("ALTER TABLE assignments ADD COLUMN user_id INTEGER"))
         db.session.commit()
 
+    # add ics_uid for robust sync if missing
+    if "ics_uid" not in assignment_col_names:
+        db.session.execute(text("ALTER TABLE assignments ADD COLUMN ics_uid VARCHAR(255)"))
+        db.session.commit()
+
 # set up login manager for aid with...logging in
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
@@ -111,6 +116,10 @@ def login():
         user = User.query.filter_by(username=username).first()
         if user and user.check_password(password):
             login_user(user)
+
+            if user.ics_url:
+                sync_assignments(user)
+
             flash("User logged in successfully!", "success")
             return redirect(url_for('index'))
 
@@ -131,9 +140,8 @@ def logout():
 @app.route('/')
 @login_required
 def index():
-    #response = requests.get(f'{URL}/assignments/')
-    #assignments = response.json()
-    return render_template('index.html', assignments=[])#, assignments=assignments)
+    assignments = Assignment.query.filter_by(user_id=current_user.id).order_by(Assignment.due_date).all()
+    return render_template('index.html', assignments=assignments)
 
 
 @app.route("/assignments/new", methods=["POST"])
@@ -157,7 +165,10 @@ def new_assignment():
 @app.route("/calendar/")
 @login_required
 def about():
-    raw_assignments = Assignment.query.filter_by(user_id=current_user.id).all()
+    if current_user.ics_url:
+        sync_assignments(current_user)
+
+    raw_assignments = Assignment.query.filter_by(user_id=current_user.id).order_by(Assignment.due_date).all()
     assignments = [
         {
             'id': a.id,
