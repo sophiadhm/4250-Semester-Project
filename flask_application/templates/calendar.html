@@ -50,9 +50,10 @@ Connect Calendar
   <ul id="assignmentList" style="list-style:none; padding-left:0;"></ul>
 </div>
 
+<script type="application/json" id="calendar-assignments-data">{{ assignments | tojson }}</script>
 <script>
-  // This script renders the widget and filename injection for assignments.
-  var assignments = {{ assignments | tojson | safe }};
+(function() {
+  var assignments = JSON.parse(document.getElementById('calendar-assignments-data').textContent);
   var eventsByDate = {};
 
   assignments.forEach(function(a) {
@@ -177,8 +178,6 @@ Connect Calendar
   });
 
   drawCalendar();
+})();
 </script>
-
-</body>
-
 {% endblock %}
