@@ -20,23 +20,21 @@
   </div>
 </div>
 
-<div class="calendar-connect">
-  <h3>Connect your D2L Calendar</h3>
+<div class="calendar-connect-card">
+    <h3>Connect your D2L Calendar</h3>
 
-  <form method="POST" action="/connect-calendar">
-    <input
-      type="text"
-      name="ics_url"
-      placeholder="Paste your D2L calendar feed"
-      required
-    >
+    <form method="POST" action="/connect-calendar">
+        <input
+            type="text"
+            name="ics_url"
+            placeholder="Paste your D2L calendar feed"
+            required
+        >
 
-    <button type="submit">
-      Connect Calendar
-    </button>
-  </form>
+        <button type="submit">Connect Calendar</button>
+    </form>
 
-  <a href="/sync">Sync Assignments</a>
+    <a href="/sync" class="sync-link">Sync Assignments</a>
 </div>
 
 <div id="dayAssignmentsOverlay" class="form-overlay hidden">
