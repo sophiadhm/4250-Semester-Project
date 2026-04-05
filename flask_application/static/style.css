@@ -60,11 +60,13 @@ a { color: inherit; text-decoration: none; }
 ========================= */
 
 .navbar {
+  background: #2f3061 !important;
+  border-bottom: none;
+  box-shadow: 0 4px 18px rgba(47,48,97,0.25);
   position: fixed;
   top: 0; left: 0; right: 0;
   width: 100%;
   z-index: 1000;
-  background: rgba(255,255,255,0.94);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--border);
@@ -87,7 +89,7 @@ a { color: inherit; text-decoration: none; }
 }
 
 .navbar-brand {
-  color: var(--text);
+    color: #C5E7DF !important;
   text-decoration: none;
   font-family: var(--font-display);
   font-size: 1rem;
