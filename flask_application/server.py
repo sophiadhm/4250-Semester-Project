@@ -17,8 +17,6 @@ from flask_application.decorators import admin_required
 import requests
 from sqlalchemy import text
 from sync import sync_assignments
-import os
-
 
 app = Flask(__name__)
 app.secret_key = 'key'
