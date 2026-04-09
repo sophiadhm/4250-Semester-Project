@@ -328,7 +328,6 @@ def sync():
     return redirect(url_for("index"))
     return redirect(url_for("assignment"))
 
-
 # ASSIGNMENTS PAGE - Displays all assignments in a list view
 @app.route("/assignments/")
 @login_required  # Require user to be logged in
