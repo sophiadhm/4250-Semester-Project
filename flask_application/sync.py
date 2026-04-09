@@ -8,16 +8,15 @@ from zoneinfo import ZoneInfo
 from app.models import db, Assignment
 
 
-
 def parse_ics_date(ics_date_str):
     """
     Parses various ICS date/time formats from calendar feeds.
-    
+
     Supports:
         - DTSTART:20240620T235900Z (UTC with Z suffix)
         - DTSTART;TZID=America/New_York:20240620T235900 (timezone ID)
         - DTSTART;VALUE=DATE:20240620 (date only, no time)
-    
+
     Returns:
         Tuple of (due_date_iso, due_time_hms):
         - due_date_iso: ISO format date string (YYYY-MM-DD)
@@ -90,15 +89,14 @@ def parse_ics_date(ics_date_str):
     return due_date, due_time
 
 
-
 def parse_course_id(title):
     """
     Extracts 4-digit course code from assignment title using regex.
-    
+
     Examples:
         "CS 3050 - Assignment 1" -> "3050"
         "Software Engineering Project" -> "0000" (fallback)
-    
+
     Returns:
         4-digit course code as string, or "0000" if not found
     """
@@ -110,18 +108,17 @@ def parse_course_id(title):
     return "0000"
 
 
-
 def sync_assignments(user):
     """
     Fetches assignments from user's ICS calendar feed and syncs to database.
-    
+
     Process:
         1. Fetches ICS file from user.ics_url
         2. Parses VEVENT entries from calendar
         3. Updates existing assignments that changed
         4. Creates new assignments from calendar
         5. Deletes assignments no longer in calendar
-    
+
     Args:
         user: User object with ics_url set
     """

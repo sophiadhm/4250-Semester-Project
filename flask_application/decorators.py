@@ -8,13 +8,13 @@ from flask_login import current_user
 def admin_required(f):
     """
     Decorator to protect Flask routes so only admin users can access them.
-    
+
     Usage:
         @app.route('/admin-page')
         @admin_required
         def admin_page():
             ...
-    
+
     Behavior:
         - Checks if current user is authenticated AND has admin role
         - If not authorized: redirects to login page and shows error message

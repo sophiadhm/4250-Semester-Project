@@ -32,7 +32,6 @@ class AssignmentBase(BaseModel):
     points: float | None = None
 
 
-
 # Request schema for POST /assignments/ (creating new assignment)
 class AssignmentCreate(BaseModel):
     # User that owns this assignment
@@ -50,7 +49,6 @@ class AssignmentCreate(BaseModel):
     assignment_type: str | None = None  # Type of assignment
     priority_level: int | None = None  # Priority level
     points: float | None = None  # Point value
-
 
 
 # Request schema for PUT /assignments/{id} (updating existing assignment)
@@ -76,7 +74,6 @@ class AssignmentUpdate(BaseModel):
     points: float | None = None
 
 
-
 # Response schema for returning assignments from API endpoints
 # Includes all base fields plus the auto-generated id from database
 class AssignmentResponse(AssignmentBase):
@@ -85,4 +82,4 @@ class AssignmentResponse(AssignmentBase):
 
     class Config:
         # Allows SQLAlchemy ORM objects to be converted to Pydantic models
-        from_attributes = True  
+        from_attributes = True

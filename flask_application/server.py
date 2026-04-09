@@ -45,7 +45,7 @@ with app.app_context():
     # So we patch schema manually if migrations needed
     assignment_cols = db.session.execute(text("PRAGMA table_info(assignments)")).fetchall()
     assignment_col_names = {col[1] for col in assignment_cols}
-    
+
     # Add user_id column if missing (for assignment ownership tracking)
     if "user_id" not in assignment_col_names:
         db.session.execute(text("ALTER TABLE assignments ADD COLUMN user_id INTEGER"))
@@ -62,7 +62,6 @@ login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 # Set flash message category for login messages
 login_manager.login_message_category = 'error'
-
 
 
 # ============================================================================
@@ -123,8 +122,8 @@ def register():
         if User.query.filter_by(username=username).first():
             # Username taken - show error and redirect
             flash("Username already exists.", "error")
-            return redirect(url_for('register'))        
-        
+            return redirect(url_for('register'))
+
         # Create new user object
         new_user = User(username=username, is_admin=is_admin)
         # Hash the password and store it
@@ -138,7 +137,7 @@ def register():
         flash("Account created successfully!", "success")
         # Redirect to login page
         return redirect(url_for('login'))
-    
+
     # Handle GET request - show registration form
     return render_template('register.html')
 
@@ -185,7 +184,6 @@ def logout():
     flash("You have been logged out.", "success")
     # Redirect to login page
     return redirect(url_for("login"))
-
 
 
 # ============================================================================
