@@ -13,3 +13,4 @@ requests
 decorators
 icalendar
 pytest
+httpx
