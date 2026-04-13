@@ -12,3 +12,5 @@ ics
 requests
 decorators
 icalendar
+pytest
+httpx
