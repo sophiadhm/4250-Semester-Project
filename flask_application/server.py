@@ -256,6 +256,34 @@ def new_assignment():
     # Redirect to home page to show new assignment
     return redirect(url_for("index"))
 
+# DELETE an assignment
+@app.route("/assignments/<int:assignment_id>/delete", methods=["POST"])
+@login_required
+def delete_assignment(assignment_id):
+    assignment = Assignment.query.filter_by(id=assignment_id, user_id=current_user.id).first()
+    if not assignment:
+        flash("Assignment not found.", "error")
+        return redirect(url_for("index"))
+    db.session.delete(assignment)
+    db.session.commit()
+    flash("Assignment deleted.", "success")
+    return redirect(url_for("index"))
+
+# EDIT an assignment
+@app.route("/assignments/<int:assignment_id>/edit", methods=["POST"])
+@login_required
+def edit_assignment(assignment_id):
+    assignment = Assignment.query.filter_by(id=assignment_id, user_id=current_user.id).first()
+    if not assignment:
+        flash("Assignment not found.", "error")
+        return redirect(url_for("index"))
+    assignment.name = request.form.get("name", assignment.name)
+    assignment.course = request.form.get("course", assignment.course)
+    assignment.due_date = request.form.get("due_date", assignment.due_date)
+    assignment.priority_level = request.form.get("priority", assignment.priority_level)
+    db.session.commit()
+    flash("Assignment updated!", "success")
+    return redirect(url_for("index"))
 
 # ============================================================================
 # CALENDAR INTEGRATION ROUTES
