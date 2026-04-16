@@ -18,9 +18,10 @@
       </div>
       <a href="/calendar" class="widget-link">Open full calendar →</a>
     </div>
-      <div style="display: flex; align-items: center; gap: 18px; margin-bottom: 10px;">
-        <div class="assign-section-label">Upcoming assignments</div>
-      </div>
+
+    <div style="display: flex; align-items: center; gap: 18px; margin-bottom: 10px;">
+      <div class="assign-section-label">Upcoming assignments</div>
+    </div>
 
     <div class="widget-card" id="pomodoroWidget">
       <div class="widget-label">Focus Timer</div>
@@ -55,7 +56,6 @@
       <button type="button" class="add-btn" id="openFormBtn">+</button>
     </div>
 
-
     <div style="display: flex; align-items: center; gap: 18px; margin-bottom: 10px;">
       <div class="assign-section-label">Upcoming assignments</div>
       <label style="font-size: 14px;">
@@ -68,127 +68,144 @@
       <!-- Assignment items will be rendered by JS -->
     </ul>
 
-<script>
-// Only define assignments once globally
-window.allAssignments = {{ assignments|tojson|safe }};
-</script>
+    <script type="text/javascript">
+      window.allAssignments = {{ assignments|tojson|safe }};
+    </script>
 
-<script>
-window.openEditModal = function(id) {
-  const a = window.allAssignments.find(x => x.id === id);
-  if (!a) { console.error('Assignment not found:', id, window.allAssignments); return; }
-  document.getElementById('editForm').action = `/assignments/${id}/edit`;
-  document.getElementById('editAssignmentId').value = a.id;
-  document.getElementById('editName').value = a.name || '';
-  document.getElementById('editCourse').value = a.course || '';
-  document.getElementById('editDueDate').value = a.due_date || '';
-  document.getElementById('editPriority').value = a.priority_level || '';
-  document.getElementById('editModal').style.display = 'flex';
-};
-window.closeEditModal = function() {
-  document.getElementById('editModal').style.display = 'none';
-};
-</script>
+    <script>
+    window.openEditModal = function(id) {
+      const a = window.allAssignments.find(x => x.id === id);
+      if (!a) {
+        console.error('Assignment not found:', id, window.allAssignments);
+        return;
+      }
+      document.getElementById('editForm').action = `/assignments/${id}/edit`;
+      document.getElementById('editAssignmentId').value = a.id;
+      document.getElementById('editName').value = a.name || '';
+      document.getElementById('editCourse').value = a.course || '';
+      document.getElementById('editDueDate').value = a.due_date || '';
+      document.getElementById('editPriority').value = a.priority_level || '';
+      document.getElementById('editModal').style.display = 'flex';
+    };
 
+    window.closeEditModal = function() {
+      document.getElementById('editModal').style.display = 'none';
+    };
+    </script>
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-  const assignList = document.getElementById('assignList');
-  const hideAvailableToggle = document.getElementById('hideAvailableToggle');
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const assignList = document.getElementById('assignList');
+      const hideAvailableToggle = document.getElementById('hideAvailableToggle');
 
-  function renderAssignments() {
-    assignList.innerHTML = '';
-    let filtered = window.allAssignments.filter(a => a.due_date && a.due_date.trim() !== '');
-    if (hideAvailableToggle.checked) {
-      filtered = filtered.filter(a => !(a.name && a.name.toLowerCase().includes('available')));
-    }
-    if (filtered.length === 0) {
-      const li = document.createElement('li');
-      li.className = 'assign-empty';
-      li.textContent = 'No assignments yet — add one to get started.';
-      assignList.appendChild(li);
-      return;
-    }
-    filtered.forEach(assignment => {
-      const p = assignment.priority_level ? parseInt(assignment.priority_level) : 0;
-      const tag_color = assignment.color || '#517664';
-      const li = document.createElement('li');
-      li.className = 'assign-row';
-      li.innerHTML = `
-        <div class="assign-row-left">
-          <span class="assign-priority-dot pri-${p}"></span>
-          <div style="display: flex; align-items: flex-start; gap: 10px; flex: 1; min-width: 0;">
-            <div style="min-width: 0; flex: 1;">
-              <div style="font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${assignment.name}</div>
-              <div style="font-size: 12px; color: #666; margin-top: 2px; display: flex; gap: 6px; flex-wrap: wrap;">
-                ${assignment.assignment_type ? `<span style="background: #e3f2fd; color: #1565c0; padding: 2px 6px; border-radius: 3px; font-size: 11px; white-space: nowrap;">${assignment.assignment_type}</span>` : ''}
-                ${assignment.priority_level ? (() => {
-                  const priorityMap = {1: {text: 'Low', color: '#22c55e'}, 2: {text: 'Medium', color: '#eab308'}, 3: {text: 'High', color: '#ef4444'}};
-                  const info = priorityMap[p] || {text: 'Unknown', color: '#6b7280'};
-                  return `<span style="background: ${info.color}; color: white; padding: 2px 6px; border-radius: 3px; font-size: 11px; white-space: nowrap; font-weight: 500;">${info.text}</span>`;
-                })() : ''}
+      function renderAssignments() {
+        assignList.innerHTML = '';
+        let filtered = window.allAssignments.filter(a => a.due_date && a.due_date.trim() !== '');
+
+        if (hideAvailableToggle.checked) {
+          filtered = filtered.filter(a => !(a.name && a.name.toLowerCase().includes('available')));
+        }
+
+        if (filtered.length === 0) {
+          const li = document.createElement('li');
+          li.className = 'assign-empty';
+          li.textContent = 'No assignments yet — add one to get started.';
+          assignList.appendChild(li);
+          return;
+        }
+
+        filtered.forEach(assignment => {
+          const p = assignment.priority_level ? parseInt(assignment.priority_level) : 0;
+          const tag_color = assignment.color || '#517664';
+          const li = document.createElement('li');
+          li.className = 'assign-row';
+
+          li.innerHTML = `
+            <div class="assign-row-left">
+              <span class="assign-priority-dot pri-${p}"></span>
+              <div style="display: flex; align-items: flex-start; gap: 10px; flex: 1; min-width: 0;">
+                <div style="min-width: 0; flex: 1;">
+                  <div style="font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${assignment.name}</div>
+                  <div style="font-size: 12px; color: #666; margin-top: 2px; display: flex; gap: 6px; flex-wrap: wrap;">
+                    ${assignment.assignment_type ? `<span style="background: #e3f2fd; color: #1565c0; padding: 2px 6px; border-radius: 3px; font-size: 11px; white-space: nowrap;">${assignment.assignment_type}</span>` : ''}
+                    ${assignment.priority_level ? (() => {
+                      const priorityMap = {
+                        1: {text: 'Low', color: '#22c55e'},
+                        2: {text: 'Medium', color: '#eab308'},
+                        3: {text: 'High', color: '#ef4444'}
+                      };
+                      const info = priorityMap[p] || {text: 'Unknown', color: '#6b7280'};
+                      return `<span style="background: ${info.color}; color: white; padding: 2px 6px; border-radius: 3px; font-size: 11px; white-space: nowrap; font-weight: 500;">${info.text}</span>`;
+                    })() : ''}
+                  </div>
+                </div>
+                ${(assignment.course && assignment.course !== assignment.name) ? `<span class="assign-tag" data-color="${tag_color}" style="white-space: nowrap; flex-shrink: 0; border-color: ${tag_color}; color: ${tag_color}; background-color: ${tag_color}18;">${assignment.course}</span>` : ''}
               </div>
             </div>
-            ${(assignment.course && assignment.course !== assignment.name) ? `<span class="assign-tag" data-color="${tag_color}" style="white-space: nowrap; flex-shrink: 0; border-color: ${tag_color}; color: ${tag_color}; background-color: ${tag_color}18;">${assignment.course}</span>` : ''}
-          </div>
-        </div>
-        <div class="assign-row-right">
-          <span class="assign-due">${assignment.due_date}</span>
-<div class="assign-options-wrap" style="position:relative;">
-  <button class="assign-action-btn" title="Options" onclick="toggleMenu(event, ${assignment.id})">···</button>
-  <div class="assign-dropdown" id="menu-${assignment.id}" style="display:none; position:absolute; right:0; top:100%; background:white; border:1px solid #ddd; border-radius:6px; box-shadow:0 2px 8px rgba(0,0,0,0.12); z-index:100; min-width:130px;">
-    <button onclick="openEditModal(${assignment.id})" style="display:block; width:100%; padding:8px 16px; text-align:left; border:none; background:none; cursor:pointer;">✏️ Edit</button>
-    <form method="POST" action="/assignments/${assignment.id}/delete" onsubmit="return confirm('Delete this assignment?')">
-      <button type="submit" style="display:block; width:100%; padding:8px 16px; text-align:left; border:none; background:none; cursor:pointer; color:#e53e3e;">🗑️ Delete</button>
-    </form>
-  </div>
-</div>
-        </div>
-      `;
-      assignList.appendChild(li);
+            <div class="assign-row-right">
+              <span class="assign-due">${assignment.due_date}</span>
+              <div class="assign-options-wrap" style="position:relative;">
+                <button class="assign-action-btn" title="Options" onclick="toggleMenu(event, ${assignment.id})">···</button>
+                <div class="assign-dropdown" id="menu-${assignment.id}" style="display:none; position:absolute; right:0; top:100%; background:white; border:1px solid #ddd; border-radius:6px; box-shadow:0 2px 8px rgba(0,0,0,0.12); z-index:100; min-width:130px;">
+                  <button onclick="openEditModal(${assignment.id})" style="display:block; width:100%; padding:8px 16px; text-align:left; border:none; background:none; cursor:pointer;">✏️ Edit</button>
+                  <form method="POST" action="/assignments/${assignment.id}/delete" onsubmit="return confirm('Delete this assignment?')">
+                    <button type="submit" style="display:block; width:100%; padding:8px 16px; text-align:left; border:none; background:none; cursor:pointer; color:#e53e3e;">🗑️ Delete</button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          `;
+          assignList.appendChild(li);
+        });
+
+        document.querySelectorAll(".assign-tag").forEach(tag => {
+          const c = tag.dataset.color || "#517664";
+          tag.style.borderColor = c;
+          tag.style.color = c;
+          tag.style.backgroundColor = c + "18";
+        });
+      }
+
+      if (localStorage.getItem('hideAvailableAssignments') === 'true') {
+        hideAvailableToggle.checked = true;
+      }
+
+      hideAvailableToggle.addEventListener('change', function() {
+        localStorage.setItem('hideAvailableAssignments', hideAvailableToggle.checked);
+        renderAssignments();
+      });
+
+      renderAssignments();
     });
-  }
 
-  // Persist toggle state in localStorage
-  if (localStorage.getItem('hideAvailableAssignments') === 'true') {
-    hideAvailableToggle.checked = true;
-  }
-  hideAvailableToggle.addEventListener('change', function() {
-    localStorage.setItem('hideAvailableAssignments', hideAvailableToggle.checked);
-    renderAssignments();
-  });
-  renderAssignments();
-});
+    window.toggleMenu = function(e, id) {
+      e.stopPropagation();
+      document.querySelectorAll('.assign-dropdown').forEach(d => {
+        if (d.id !== 'menu-' + id) d.style.display = 'none';
+      });
+      const menu = document.getElementById('menu-' + id);
+      menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+    };
 
-// Toggle dropdown menu
-window.toggleMenu = function(e, id) {
-  e.stopPropagation();
-  document.querySelectorAll('.assign-dropdown').forEach(d => {
-    if (d.id !== 'menu-' + id) d.style.display = 'none';
-  });
-  const menu = document.getElementById('menu-' + id);
-  menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
-};
-// Close menus when clicking outside
-document.addEventListener('click', () => {
-  document.querySelectorAll('.assign-dropdown').forEach(d => d.style.display = 'none');
-});
+    document.addEventListener('click', () => {
+      document.querySelectorAll('.assign-dropdown').forEach(d => d.style.display = 'none');
+    });
 
-// Edit modal
-window.openEditModal = function(id) {
-  const a = window.allAssignments.find(x => x.id === id);
-  if (!a) return;
-  document.getElementById('editAssignmentId').value = a.id;
-  document.getElementById('editName').value = a.name || '';
-  document.getElementById('editCourse').value = a.course || '';
-  document.getElementById('editDueDate').value = a.due_date || '';
-  document.getElementById('editPriority').value = a.priority_level || '';
-  document.getElementById('editModal').style.display = 'flex';
-};
-window.closeEditModal = function() {
-  document.getElementById('editModal').style.display = 'none';
-};
-</script>
+    window.openEditModal = function(id) {
+      const a = window.allAssignments.find(x => x.id === id);
+      if (!a) return;
+      document.getElementById('editAssignmentId').value = a.id;
+      document.getElementById('editName').value = a.name || '';
+      document.getElementById('editCourse').value = a.course || '';
+      document.getElementById('editDueDate').value = a.due_date || '';
+      document.getElementById('editPriority').value = a.priority_level || '';
+      document.getElementById('editModal').style.display = 'flex';
+    };
+
+    window.closeEditModal = function() {
+      document.getElementById('editModal').style.display = 'none';
+    };
+    </script>
 
   </main>
 </div>
@@ -204,13 +221,11 @@ window.closeEditModal = function() {
 
     <form method="POST" action="/assignments/new" id="assignForm">
 
-      <!-- Assignment Name -->
       <div class="field-group">
         <label class="field-label" for="name">Assignment Name</label>
         <input class="field-input" type="text" id="name" name="name" placeholder="e.g. Lab Report #4" required>
       </div>
 
-      <!-- Class Name + Color (inline row) -->
       <div class="field-row">
         <div class="field-group" style="flex:1">
           <label class="field-label" for="course">Class</label>
@@ -220,19 +235,16 @@ window.closeEditModal = function() {
           <label class="field-label" for="class_color">Color</label>
           <div class="color-picker-wrap">
             <input type="color" id="class_color" name="class_color" value="#517664">
-            <!-- Live tag preview -->
             <span class="tag-preview" id="tagPreview">CSCI 4250</span>
           </div>
         </div>
       </div>
 
-      <!-- Due Date -->
       <div class="field-group">
         <label class="field-label" for="due_date">Due Date</label>
         <input class="field-input" type="date" id="due_date" name="due_date" required>
       </div>
 
-      <!-- Priority (dot picker) -->
       <div class="field-group">
         <label class="field-label">Priority</label>
         <div class="priority-picker">
@@ -265,36 +277,38 @@ window.closeEditModal = function() {
 document.addEventListener("DOMContentLoaded", function () {
 
   // ── Overlay open/close ──
-  const overlay  = document.getElementById("formOverlay");
-  const openBtn  = document.getElementById("openFormBtn");
+  const overlay = document.getElementById("formOverlay");
+  const openBtn = document.getElementById("openFormBtn");
   const closeBtn = document.getElementById("closeFormBtn");
   const cancelBtn = document.getElementById("cancelBtn");
 
-  openBtn.addEventListener("click",   () => overlay.classList.remove("hidden"));
-  closeBtn.addEventListener("click",  () => overlay.classList.add("hidden"));
+  openBtn.addEventListener("click", () => overlay.classList.remove("hidden"));
+  closeBtn.addEventListener("click", () => overlay.classList.add("hidden"));
   cancelBtn.addEventListener("click", () => overlay.classList.add("hidden"));
-  overlay.addEventListener("click",   e => { if (e.target === overlay) overlay.classList.add("hidden"); });
+  overlay.addEventListener("click", e => {
+    if (e.target === overlay) overlay.classList.add("hidden");
+  });
 
-  // ── Tag preview (color + course name) ──
-  const colorInput  = document.getElementById("class_color");
+  // ── Tag preview ──
+  const colorInput = document.getElementById("class_color");
   const courseInput = document.getElementById("course");
-  const tagPreview  = document.getElementById("tagPreview");
+  const tagPreview = document.getElementById("tagPreview");
 
   function updateTagPreview() {
     const color = colorInput.value;
-    const name  = courseInput.value.trim() || "Course Tag";
+    const name = courseInput.value.trim() || "Course Tag";
     tagPreview.textContent = name;
-    tagPreview.style.borderColor     = color;
-    tagPreview.style.color           = color;
+    tagPreview.style.borderColor = color;
+    tagPreview.style.color = color;
     tagPreview.style.backgroundColor = color + "18";
   }
 
-  colorInput.addEventListener("input",  updateTagPreview);
+  colorInput.addEventListener("input", updateTagPreview);
   courseInput.addEventListener("input", updateTagPreview);
-  updateTagPreview(); // init
+  updateTagPreview();
 
-  // ── Priority dot picker ──
-  const priInput   = document.getElementById("priority");
+  // ── Priority picker ──
+  const priInput = document.getElementById("priority");
   const priOptions = document.querySelectorAll(".pri-option");
 
   priOptions.forEach(btn => {
@@ -305,167 +319,133 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 
-  // ── Course tag colors on list ──
-  document.querySelectorAll(".assign-tag").forEach(tag => {
-    const c = tag.dataset.color || "#517664";
-    tag.style.borderColor     = c;
-    tag.style.color           = c;
-    tag.style.backgroundColor = c + "18";
-  });
-
   // ── Mini Calendar ──
   const months = ["January","February","March","April","May","June",
                   "July","August","September","October","November","December"];
-  const days   = ["Su","Mo","Tu","We","Th","Fr","Sa"];
-  let cur   = new Date();
+  const days = ["Su","Mo","Tu","We","Th","Fr","Sa"];
+
+  let cur = new Date();
+  cur = new Date(cur.getFullYear(), cur.getMonth(), 1);
+
   const tod = new Date();
+  const miniAssignments = window.allAssignments || [];
 
-    // Assignment data for mini calendar
-    const miniAssignments = window.allAssignments;
-    // Map assignments by date (YYYY-MM-DD)
-    const miniEventsByDate = {};
-    miniAssignments.forEach(a => {
-      if (!a.due_date) return;
-      const date = a.due_date.trim();
-      if (!miniEventsByDate[date]) miniEventsByDate[date] = [];
-      miniEventsByDate[date].push(a);
-    });
-
-    function drawMini() {
-      const y = cur.getFullYear(), m = cur.getMonth();
-      document.getElementById("miniCalTitle").textContent = months[m].slice(0,3) + " " + y;
-      const grid = document.getElementById("miniCalGrid");
-      grid.innerHTML = "";
-      days.forEach(d => {
-        const lbl = document.createElement("div");
-        lbl.className = "mc-lbl"; lbl.textContent = d; grid.appendChild(lbl);
-      });
-      const fd  = new Date(y, m, 1).getDay();
-      const dim = new Date(y, m+1, 0).getDate();
-      for (let i = 0; i < fd; i++) {
-        const e = document.createElement("div"); e.className = "mc-day empty"; grid.appendChild(e);
-      }
-      for (let d = 1; d <= dim; d++) {
-        const cell = document.createElement("div");
-        cell.className = "mc-day"; cell.textContent = d;
-        if (d === tod.getDate() && m === tod.getMonth() && y === tod.getFullYear())
-          cell.classList.add("mc-today");
-
-        // Add assignment dots if any
-        const key = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-        if (miniEventsByDate[key]) {
-          cell.style.position = 'relative';
-          // Show up to 3 colored dots for unique courses
-          const courseColors = {};
-          miniEventsByDate[key].forEach(evt => {
-            const course = evt.course || 'uncategorized';
-            if (!courseColors[course]) {
-              courseColors[course] = evt.color || '#517664';
-            }
-          });
-          const dots = Object.values(courseColors).slice(0,3);
-          const dotWrap = document.createElement('div');
-          dotWrap.style.display = 'flex';
-          dotWrap.style.justifyContent = 'center';
-          dotWrap.style.gap = '3px';
-          dotWrap.style.marginTop = '2px';
-          dots.forEach(color => {
-            const dot = document.createElement('span');
-            dot.style.display = 'inline-block';
-            dot.style.width = '6px';
-            dot.style.height = '6px';
-            dot.style.borderRadius = '50%';
-            dot.style.background = color;
-            dotWrap.appendChild(dot);
-          });
-          cell.appendChild(dotWrap);
-        }
-        grid.appendChild(cell);
-      }
+  const miniEventsByDate = {};
+  miniAssignments.forEach(a => {
+    if (!a.due_date) return;
+    const date = a.due_date.trim();
+    if (!miniEventsByDate[date]) {
+      miniEventsByDate[date] = [];
     }
-    document.getElementById("miniPrev").addEventListener("click", () => { cur.setMonth(cur.getMonth()-1); drawMini(); });
-    document.getElementById("miniNext").addEventListener("click", () => { cur.setMonth(cur.getMonth()+1); drawMini(); });
-    drawMini();
-
-    // Hide Available Assignments filter logic (copied from assignments page)
-    const allAssignmentsCards = Array.from(document.querySelectorAll('.assignment-card'));
-    const hideAvailableToggle = document.getElementById('hideAvailableToggle');
-    if (localStorage.getItem('hideAvailableAssignments') === 'true') {
-      hideAvailableToggle.checked = true;
-    }
-    function filterAssignments() {
-      const hideAvailable = hideAvailableToggle.checked;
-      allAssignmentsCards.forEach(card => {
-        const title = card.querySelector('div[style*="font-weight: 500"]')?.textContent || '';
-        if (hideAvailable && title.toLowerCase().includes('available')) {
-          card.style.display = 'none';
-        } else {
-          card.style.display = '';
-        }
-      });
-      localStorage.setItem('hideAvailableAssignments', hideAvailableToggle.checked);
-    }
-    hideAvailableToggle.addEventListener('change', filterAssignments);
-    window.addEventListener('DOMContentLoaded', filterAssignments);
+    miniEventsByDate[date].push(a);
+  });
 
   function drawMini() {
-    const y = cur.getFullYear(), m = cur.getMonth();
-    document.getElementById("miniCalTitle").textContent = months[m].slice(0,3) + " " + y;
+    const y = cur.getFullYear();
+    const m = cur.getMonth();
+
+    document.getElementById("miniCalTitle").textContent = months[m].slice(0, 3) + " " + y;
+
     const grid = document.getElementById("miniCalGrid");
     grid.innerHTML = "";
+
     days.forEach(d => {
       const lbl = document.createElement("div");
-      lbl.className = "mc-lbl"; lbl.textContent = d; grid.appendChild(lbl);
+      lbl.className = "mc-lbl";
+      lbl.textContent = d;
+      grid.appendChild(lbl);
     });
-    const fd  = new Date(y, m, 1).getDay();
-    const dim = new Date(y, m+1, 0).getDate();
+
+    const fd = new Date(y, m, 1).getDay();
+    const dim = new Date(y, m + 1, 0).getDate();
+
     for (let i = 0; i < fd; i++) {
-      const e = document.createElement("div"); e.className = "mc-day empty"; grid.appendChild(e);
+      const e = document.createElement("div");
+      e.className = "mc-day empty";
+      grid.appendChild(e);
     }
+
     for (let d = 1; d <= dim; d++) {
       const cell = document.createElement("div");
-      cell.className = "mc-day"; cell.textContent = d;
-      if (d === tod.getDate() && m === tod.getMonth() && y === tod.getFullYear())
-        cell.classList.add("mc-today");
+      cell.className = "mc-day";
+      cell.textContent = d;
 
-        // Add assignment dots if any
-        const key = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-        if (miniEventsByDate[key]) {
-          cell.style.position = 'relative';
-          // Show up to 3 colored dots for unique courses
-          const courseColors = {};
-          miniEventsByDate[key].forEach(evt => {
-            const course = evt.course || 'uncategorized';
-            if (!courseColors[course]) {
-              courseColors[course] = evt.color || '#517664';
-            }
-          });
-          const dots = Object.values(courseColors).slice(0,3);
-          const dotWrap = document.createElement('div');
-          dotWrap.style.display = 'flex';
-          dotWrap.style.justifyContent = 'center';
-          dotWrap.style.gap = '3px';
-          dotWrap.style.marginTop = '2px';
-          dots.forEach(color => {
-            const dot = document.createElement('span');
-            dot.style.display = 'inline-block';
-            dot.style.width = '6px';
-            dot.style.height = '6px';
-            dot.style.borderRadius = '50%';
-            dot.style.background = color;
-            dotWrap.appendChild(dot);
-          });
-          cell.appendChild(dotWrap);
-        }
+      if (
+        d === tod.getDate() &&
+        m === tod.getMonth() &&
+        y === tod.getFullYear()
+      ) {
+        cell.classList.add("mc-today");
+      }
+
+      const key = `${y}-${String(m + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+
+      if (miniEventsByDate[key]) {
+        cell.style.position = "relative";
+
+        const courseColors = {};
+        miniEventsByDate[key].forEach(evt => {
+          const course = evt.course || "uncategorized";
+          if (!courseColors[course]) {
+            courseColors[course] = evt.color || "#517664";
+          }
+        });
+
+        const dots = Object.values(courseColors).slice(0, 3);
+
+        const dotWrap = document.createElement("div");
+        dotWrap.style.display = "flex";
+        dotWrap.style.justifyContent = "center";
+        dotWrap.style.gap = "3px";
+        dotWrap.style.marginTop = "2px";
+
+        dots.forEach(color => {
+          const dot = document.createElement("span");
+          dot.style.display = "inline-block";
+          dot.style.width = "6px";
+          dot.style.height = "6px";
+          dot.style.borderRadius = "50%";
+          dot.style.background = color;
+          dotWrap.appendChild(dot);
+        });
+
+        cell.appendChild(dotWrap);
+      }
+
       grid.appendChild(cell);
     }
   }
-  document.getElementById("miniPrev").addEventListener("click", () => { cur.setMonth(cur.getMonth()-1); drawMini(); });
-  document.getElementById("miniNext").addEventListener("click", () => { cur.setMonth(cur.getMonth()+1); drawMini(); });
+
+  document.getElementById("miniPrev").addEventListener("click", function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    cur = new Date(cur.getFullYear(), cur.getMonth() - 1, 1);
+    drawMini();
+  });
+
+  document.getElementById("miniNext").addEventListener("click", function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    cur = new Date(cur.getFullYear(), cur.getMonth() + 1, 1);
+    drawMini();
+  });
+
+  const miniWidget = document.getElementById("miniCalWidget");
+  if (miniWidget) {
+    miniWidget.addEventListener("click", function (e) {
+      if (!e.target.closest(".mini-nav") && !e.target.closest(".widget-link")) {
+        window.location.href = "/calendar";
+      }
+    });
+  }
+
   drawMini();
 
   // ── Pomodoro ──
-  window._pm = 25; window._ps = 1500; window._pr = false; window._pi = null;
+  window._pm = 25;
+  window._ps = 1500;
+  window._pr = false;
+  window._pi = null;
 
   window.setMode = function(btn, mins, label) {
     document.querySelectorAll(".pomo-tab").forEach(t => t.classList.remove("active"));
@@ -475,54 +455,56 @@ document.addEventListener("DOMContentLoaded", function () {
   };
 
   window.setCustomMode = function(btn) {
-  const input = prompt("Enter custom time in minutes:");
+    const input = prompt("Enter custom time in minutes:");
 
-  if (!input) return;
+    if (!input) return;
 
-  const mins = parseInt(input);
+    const mins = parseInt(input);
 
-  if (isNaN(mins) || mins <= 0) {
-    alert("Please enter a valid number.");
-    return;
-  }
+    if (isNaN(mins) || mins <= 0) {
+      alert("Please enter a valid number.");
+      return;
+    }
 
-  document.querySelectorAll(".pomo-tab").forEach(t => t.classList.remove("active"));
-  btn.classList.add("active");
+    document.querySelectorAll(".pomo-tab").forEach(t => t.classList.remove("active"));
+    btn.classList.add("active");
 
-  window._pm = mins;
-  resetPomo();
-};
+    window._pm = mins;
+    resetPomo();
+  };
 
   window.togglePomo = function() {
     if (window._pr) {
-      clearInterval(window._pi); window._pr = false;
+      clearInterval(window._pi);
+      window._pr = false;
       document.getElementById("pomoStartStop").textContent = "Resume";
     } else {
       window._pr = true;
       document.getElementById("pomoStartStop").textContent = "Pause";
       window._pi = setInterval(() => {
         if (window._ps <= 0) {
-          clearInterval(window._pi); window._pr = false;
+          clearInterval(window._pi);
+          window._pr = false;
           document.getElementById("pomoStartStop").textContent = "Start";
           document.getElementById("pomoDisplay").textContent = "Done!";
           return;
         }
         window._ps--;
-        const m = String(Math.floor(window._ps / 60)).padStart(2,"0");
-        const s = String(window._ps % 60).padStart(2,"0");
+        const m = String(Math.floor(window._ps / 60)).padStart(2, "0");
+        const s = String(window._ps % 60).padStart(2, "0");
         document.getElementById("pomoDisplay").textContent = m + ":" + s;
       }, 1000);
     }
   };
 
   window.resetPomo = function() {
-    clearInterval(window._pi); window._pr = false;
+    clearInterval(window._pi);
+    window._pr = false;
     window._ps = window._pm * 60;
-    const m = String(window._pm).padStart(2,"0");
+    const m = String(window._pm).padStart(2, "0");
     document.getElementById("pomoDisplay").textContent = m + ":00";
     document.getElementById("pomoStartStop").textContent = "Start";
   };
-
 });
 </script>
 
