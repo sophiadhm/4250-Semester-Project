@@ -9,7 +9,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 db = SQLAlchemy()
 
 # --- CourseColor model for user course color preferences ---
-from sqlalchemy.orm import relationship
+# from sqlalchemy.orm import relationship
 
 class CourseColor(db.Model):
     __tablename__ = "course_colors"

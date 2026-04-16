@@ -4,10 +4,10 @@
   align-items: center;
   min-height: 70vh;
 }
+
 /* used AI here to help with some of the styling needs */
 
 .calendar-page {
-  /*max-width: 1100px*/
   margin: 0 auto;
   padding: 24px 18px;
 }
@@ -37,7 +37,6 @@
   color: var(--primary);
 }
 
-
 .cal-nav {
   background: none;
   border: 1px solid var(--border);
@@ -53,7 +52,9 @@
   justify-content: center;
 }
 
-.cal-nav:hover { background: var(--highlight); }
+.cal-nav:hover {
+  background: var(--highlight);
+}
 
 .cal-grid {
   display: grid;
@@ -71,7 +72,6 @@
   text-transform: uppercase;
 }
 
-
 .cal-day {
   text-align: center;
   padding: 0.55rem 0;
@@ -86,7 +86,9 @@
   background: var(--highlight);
 }
 
-.cal-day.empty { cursor: default; }
+.cal-day.empty {
+  cursor: default;
+}
 
 .cal-day.today {
   background: var(--accent);
@@ -100,7 +102,9 @@
   color: #fff;
 }
 
-.cal-day.other-month { color: var(--border); }
+.cal-day.other-month {
+  color: var(--border);
+}
 
 .cal-day.has-event {
   position: relative;
@@ -129,6 +133,7 @@
   justify-content: center;
   line-height: 1;
 }
+
 .calendar-connect {
   max-width: 760px;
   margin: 24px auto 0;
@@ -175,40 +180,44 @@
 }
 
 .calendar-connect-card {
+  width: 100%;
   max-width: 520px;
-  margin: 40px auto 0;
   padding: 24px;
-
   border-radius: 18px;
   border: 1px solid rgba(255, 255, 255, 0.25);
-
   background: rgba(255, 255, 255, 0.2);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
-
   box-shadow: 0 10px 30px rgba(56, 38, 25, 0.15);
-
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
 }
 
 .calendar-connect-card h3 {
-  margin: 0;
+  margin: 0 0 12px 0;
   color: var(--text);
   font-weight: 700;
 }
 
-/* INPUT */
+.calendar-connect-card form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.calendar-connect-card label {
+  font-weight: 600;
+  color: var(--text);
+}
+
 .calendar-connect-card input {
   width: 100%;
   padding: 10px 12px;
   border-radius: 12px;
   border: 1px solid var(--border);
-  background: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.85);
+  font: inherit;
+  box-sizing: border-box;
 }
 
-/* BUTTON */
 .calendar-connect-card button {
   margin-top: 8px;
   padding: 10px 14px;
@@ -225,7 +234,6 @@
   background: #3f5e52;
 }
 
-/* SYNC LINK */
 .sync-link {
   margin-top: 6px;
   color: var(--primary);
@@ -236,22 +244,13 @@
 .sync-link:hover {
   text-decoration: underline;
 }
+
 .calendar-actions {
   max-width: 760px;
-  margin: 28px auto 0;
+  margin: 28px auto 32px;
   padding: 0 18px;
   display: flex;
   align-items: center;
   gap: 16px;
   flex-wrap: wrap;
-  margin-bottom: 32px;
-
-.sync-link {
-  color: var(--primary);
-  font-weight: 600;
-  text-decoration: none;
-}
-
-.sync-link:hover {
-  text-decoration: underline;
 }
