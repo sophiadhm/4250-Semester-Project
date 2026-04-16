@@ -20,7 +20,19 @@
 
         <!-- D2L Calendar -->
         <form method="POST" class="account-form">
-            <h3>Connect D2L Calendar</h3>
+            <div class="section-title-row">
+                <h3>Connect D2L Calendar</h3>
+                <button type="button" class="info-icon-btn" onclick="openD2LInfoModal()">i</button>
+            </div>
+        <div id="d2lInfoModal" class="info-modal-overlay">
+            <div class="info-modal-box">
+                <button type="button" class="info-modal-close" onclick="closeD2LInfoModal()">×</button>
+                <h4>How to connect your D2L calendar</h4>
+                <p>Go to your D2L calendar and open the <strong>Subscribe to Calendar</strong> option.</p>
+                <p>Copy the ICS link provided by D2L and paste it into the field on this page.</p>
+                <p>Once saved, your app can use that link to sync assignment dates more easily.</p>
+            </div>
+        </div>
             <input type="text" name="ics_url" placeholder="Paste your ICS link here" value="{{ current_user.ics_url }}">
             <button type="submit">Save Link</button>
         </form>
@@ -85,4 +97,21 @@
     </div>
 </div>
 
+
+<script>
+function openD2LInfoModal() {
+    document.getElementById("d2lInfoModal").classList.add("show");
+}
+
+function closeD2LInfoModal() {
+    document.getElementById("d2lInfoModal").classList.remove("show");
+}
+
+window.addEventListener("click", function(e) {
+    const modal = document.getElementById("d2lInfoModal");
+    if (e.target === modal) {
+        closeD2LInfoModal();
+    }
+});
+</script>
 {% endblock %}
