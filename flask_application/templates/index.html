@@ -69,8 +69,8 @@
     </ul>
 
 <script>
-// Only define assignments once globally and silence JS errors
-window.allAssignments = JSON.parse('{{ assignments|tojson|safe }}');
+// Only define assignments once globally
+window.allAssignments = {{ assignments|tojson|safe }};
 </script>
 
 <script>
