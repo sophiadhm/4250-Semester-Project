@@ -41,6 +41,26 @@
   --font-display: 'Lora', Georgia, serif;
 }
 
+/* Dark theme overrides */
+.dark-theme {
+  --bg:        #18191a;
+  --surface:   #23272f;
+  --sidebar:   #20232a;
+  --hover:     #23272f;
+  --text:      #e4e6eb;
+  --muted:     #b0b3b8;
+  --border:    #393b40;
+  --primary:       #8ab4f8;
+  --primary-hover: #5c7fa3;
+  --accent:        #517664;
+  --accent-hover:  #3f5e52;
+  --highlight:     #23272f;
+  /* Priority dot colors */
+  --pri-1: #22c55e;
+  --pri-2: #eab308;
+  --pri-3: #ef4444;
+}
+
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 html, body {

@@ -5,10 +5,18 @@
 <div class="account-container">
     <div class="account-card">
 
+
+        <!-- Theme Toggle -->
+        <div style="display: flex; justify-content: flex-end; margin-bottom: 18px;">
+            <button id="theme-toggle" style="padding: 6px 16px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-weight: 600; cursor: pointer;">
+                Switch to Dark Theme
+            </button>
+        </div>
+
         <h2 class="account-title">Account Settings</h2>
 
         <div style="font-size: 0.85rem; color: #9b9a97; margin-bottom: 18px; text-align: center;">
-            <strong style="color: #37352f;">Welcome, {{ current_user.username }}!</strong>
+            <strong id="welcome-user" style="color: #37352f;">Welcome, {{ current_user.username }}!</strong>
         </div>
 
         <!-- Change Password -->
@@ -113,5 +121,35 @@ window.addEventListener("click", function(e) {
         closeD2LInfoModal();
     }
 });
+</script>
+
+<!-- Theme toggle script -->
+<script>
+    // Theme switching logic
+    const themeToggle = document.getElementById('theme-toggle');
+    const welcomeUser = document.getElementById('welcome-user');
+    function setTheme(theme) {
+        if (theme === 'dark') {
+            document.body.classList.add('dark-theme');
+            themeToggle.textContent = 'Switch to Light Theme';
+            if (welcomeUser) welcomeUser.style.color = '#fff';
+        } else {
+            document.body.classList.remove('dark-theme');
+            themeToggle.textContent = 'Switch to Dark Theme';
+            if (welcomeUser) welcomeUser.style.color = '#37352f';
+        }
+        localStorage.setItem('theme', theme); // Always save theme on set
+    }
+    // Load theme from localStorage on every page load
+    document.addEventListener('DOMContentLoaded', function() {
+        const savedTheme = localStorage.getItem('theme');
+        setTheme(savedTheme === 'dark' ? 'dark' : 'light');
+    });
+    themeToggle.addEventListener('click', () => {
+        const isDark = document.body.classList.toggle('dark-theme');
+        const newTheme = isDark ? 'dark' : 'light';
+        setTheme(newTheme);
+    });
+</script>
 </script>
 {% endblock %}

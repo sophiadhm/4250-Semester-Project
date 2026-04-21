@@ -48,3 +48,16 @@
     </div>
 </footer>
 </body>
+<script>
+    // Always apply saved theme on every page load
+    document.addEventListener('DOMContentLoaded', function() {
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            document.body.classList.add('dark-theme');
+        } else {
+            document.body.classList.remove('dark-theme');
+        }
+    });
+</script>
+</body>
+</body>
