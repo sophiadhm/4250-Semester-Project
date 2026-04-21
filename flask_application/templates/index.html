@@ -451,8 +451,12 @@ document.addEventListener("DOMContentLoaded", function () {
   
 
   window.setMode = function(btn, mins, label) {
+    document.querySelectorAll(".pomo-tab").forEach(t => t.classList.remove("active"));
+    btn.classList.add("active");
+
     window._pm = mins;
     window._initialSeconds = mins * 60;
+
     resetPomo();
   };
 
