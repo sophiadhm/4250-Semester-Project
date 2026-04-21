@@ -24,7 +24,12 @@
     </div>
 
     <div class="widget-card" id="pomodoroWidget">
-      <div class="widget-label">Focus Timer</div>
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <div class="widget-label">Focus Timer</div>
+        <button id="pomoFullscreenBtn" style="background:none; border:none; cursor:pointer; font-size:16px;">
+          ⛶
+        </button>
+      </div>
       <div class="pomodoro">
         <div class="pomo-display" id="pomoDisplay">25:00</div>
         <div class="pomo-mode-tabs">
@@ -317,6 +322,14 @@ document.addEventListener("DOMContentLoaded", function () {
       btn.classList.add("selected");
       priInput.value = btn.dataset.value;
     });
+
+
+  const fsBtn = document.getElementById("pomoFullscreenBtn");
+  const widget = document.getElementById("pomodoroWidget");
+
+  fsBtn.addEventListener("click", () => {
+    widget.classList.toggle("fullscreen");
+  });
   });
 
   // ── Mini Calendar ──
