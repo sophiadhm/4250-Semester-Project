@@ -19,9 +19,15 @@
       <a href="/calendar" class="widget-link">Open full calendar →</a>
     </div>
 
-    <div style="display: flex; align-items: center; gap: 18px; margin-bottom: 10px;">
-      <div class="assign-section-label">Upcoming assignments</div>
+    <!-- Course Filter Widget -->
+    <div class="widget-card" id="courseFilterWidget">
+      <div class="widget-label">Filter by Course</div>
+      <select id="courseFilter">
+        <option value="">All Courses</option>
+      </select>
     </div>
+
+
 
     <div class="widget-card" id="pomodoroWidget">
       <div class="widget-label">Focus Timer</div>
@@ -96,8 +102,22 @@
 
     <script>
     document.addEventListener('DOMContentLoaded', function() {
+
       const assignList = document.getElementById('assignList');
       const hideAvailableToggle = document.getElementById('hideAvailableToggle');
+      const courseFilter = document.getElementById('courseFilter');
+
+      // Populate course filter dropdown if present
+      if (courseFilter) {
+        const courses = Array.from(new Set(window.allAssignments.map(a => a.course).filter(Boolean)));
+        courses.sort();
+        courses.forEach(course => {
+          const opt = document.createElement('option');
+          opt.value = course;
+          opt.textContent = course;
+          courseFilter.appendChild(opt);
+        });
+      }
 
       function renderAssignments() {
         assignList.innerHTML = '';
@@ -105,6 +125,10 @@
 
         if (hideAvailableToggle.checked) {
           filtered = filtered.filter(a => !(a.name && a.name.toLowerCase().includes('available')));
+        }
+
+        if (courseFilter.value) {
+          filtered = filtered.filter(a => a.course === courseFilter.value);
         }
 
         if (filtered.length === 0) {
@@ -173,6 +197,10 @@
 
       hideAvailableToggle.addEventListener('change', function() {
         localStorage.setItem('hideAvailableAssignments', hideAvailableToggle.checked);
+        renderAssignments();
+      });
+
+      courseFilter.addEventListener('change', function() {
         renderAssignments();
       });
 
