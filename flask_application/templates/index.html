@@ -446,6 +446,7 @@ document.addEventListener("DOMContentLoaded", function () {
   window._ps = 1500;
   window._pr = false;
   window._pi = null;
+  window._sessionIndex = 0;
 
   window.setMode = function(btn, mins, label) {
     document.querySelectorAll(".pomo-tab").forEach(t => t.classList.remove("active"));
@@ -455,22 +456,39 @@ document.addEventListener("DOMContentLoaded", function () {
   };
 
   window.setCustomMode = function(btn) {
-    const input = prompt("Enter custom time in minutes:");
+    const input = prompt("Enter time (MM:SS or just seconds):");
 
     if (!input) return;
 
-    const mins = parseInt(input);
+    let totalSeconds = 0;
 
-    if (isNaN(mins) || mins <= 0) {
-      alert("Please enter a valid number.");
-      return;
+    if (input.includes(":")) {
+      const parts = input.split(":");
+      const mins = parseInt(parts[0]);
+      const secs = parseInt(parts[1]);
+
+      if (isNaN(mins) || isNaN(secs)) {
+        alert("Invalid format. Use MM:SS.");
+        return;
+      }
+
+      totalSeconds = mins * 60 + secs;
+    } else {
+      const secs = parseInt(input);
+      if (isNaN(secs) || secs <= 0) {
+        alert("Enter a valid number.");
+        return;
+      }
+      totalSeconds = secs;
     }
 
     document.querySelectorAll(".pomo-tab").forEach(t => t.classList.remove("active"));
     btn.classList.add("active");
 
-    window._pm = mins;
-    resetPomo();
+    window._ps = totalSeconds;
+    window._pm = Math.floor(totalSeconds / 60);
+
+    updateDisplay();
   };
 
   window.togglePomo = function() {
@@ -485,24 +503,53 @@ document.addEventListener("DOMContentLoaded", function () {
         if (window._ps <= 0) {
           clearInterval(window._pi);
           window._pr = false;
+
+          // advance session dot
+          advanceSession();
+
           document.getElementById("pomoStartStop").textContent = "Start";
-          document.getElementById("pomoDisplay").textContent = "Done!";
+          window._ps = window._pm * 60; // reset time
+          updateDisplay();
           return;
         }
         window._ps--;
-        const m = String(Math.floor(window._ps / 60)).padStart(2, "0");
-        const s = String(window._ps % 60).padStart(2, "0");
-        document.getElementById("pomoDisplay").textContent = m + ":" + s;
+        updateDisplay();
       }, 1000);
     }
   };
+  
+  function advanceSession() {
+    const dots = document.querySelectorAll(".pomo-dot");
+
+    dots[window._sessionIndex].classList.remove("active");
+
+    window._sessionIndex++;
+
+    if (window._sessionIndex >= dots.length) {
+      window._sessionIndex = 0; // loop or stop if you prefer
+    }
+
+    dots[window._sessionIndex].classList.add("active");
+  }
+
+  function updateDisplay() {
+    const m = String(Math.floor(window._ps / 60)).padStart(2, "0");
+    const s = String(window._ps % 60).padStart(2, "0");
+    document.getElementById("pomoDisplay").textContent = `${m}:${s}`;
+  }
 
   window.resetPomo = function() {
     clearInterval(window._pi);
     window._pr = false;
+
     window._ps = window._pm * 60;
-    const m = String(window._pm).padStart(2, "0");
-    document.getElementById("pomoDisplay").textContent = m + ":00";
+    window._sessionIndex = 0;
+
+    document.querySelectorAll(".pomo-dot").forEach((d, i) => {
+      d.classList.toggle("active", i === 0);
+    });
+
+    updateDisplay();
     document.getElementById("pomoStartStop").textContent = "Start";
   };
 });
