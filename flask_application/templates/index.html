@@ -69,29 +69,7 @@
     </ul>
 
     <script type="text/javascript">
-      window.allAssignments = {{ assignments|tojson|safe }};
-    </script>
-
-
-    <script>
-    window.openEditModal = function(id) {
-      const a = window.allAssignments.find(x => x.id === id);
-      if (!a) {
-        console.error('Assignment not found:', id, window.allAssignments);
-        return;
-      }
-      document.getElementById('editForm').action = `/assignments/${id}/edit`;
-      document.getElementById('editAssignmentId').value = a.id;
-      document.getElementById('editName').value = a.name || '';
-      document.getElementById('editCourse').value = a.course || '';
-      document.getElementById('editDueDate').value = a.due_date || '';
-      document.getElementById('editPriority').value = a.priority_level || '';
-      document.getElementById('editModal').style.display = 'flex';
-    };
-
-    window.closeEditModal = function() {
-      document.getElementById('editModal').style.display = 'none';
-    };
+      window.allAssignments = {{ assignments | tojson | safe }};
     </script>
 
     <script>
@@ -195,6 +173,7 @@
     window.openEditModal = function(id) {
       const a = window.allAssignments.find(x => x.id === id);
       if (!a) return;
+      document.getElementById('editForm').action = `/assignments/${id}/edit`;
       document.getElementById('editAssignmentId').value = a.id;
       document.getElementById('editName').value = a.name || '';
       document.getElementById('editCourse').value = a.course || '';
@@ -514,7 +493,7 @@ document.addEventListener("DOMContentLoaded", function () {
   <div style="background:white; border-radius:10px; padding:28px; min-width:320px; max-width:420px; width:90%;">
     <h2 style="margin-top:0;">Edit Assignment</h2>
     <form method="POST" id="editForm">
-      <input type="hidden" id="editAssignmentId">
+      <input type="hidden" id="editAssignmentId" name="assignment_id">
       <label>Name<br>
         <input type="text" id="editName" name="name" style="width:100%; margin-bottom:10px; padding:6px; border:1px solid #ccc; border-radius:4px;">
       </label>
