@@ -70,7 +70,11 @@
                         {% if assignment.due_time %}
                             <div>
                                 <p style="margin: 0; font-size: 12px; color: #6b7280; font-weight: 600;">DUE TIME</p>
-                                <p style="margin: 4px 0 0 0; font-size: 14px; color: #1f2937; font-family: monospace;">{{ assignment.due_time }}</p>
+                                {% set hour24 = assignment.due_time[0:2] | int %}
+                                {% set minute = assignment.due_time[3:5] %}
+                                {% set ampm = 'PM' if hour24 >= 12 else 'AM' %}
+                                {% set hour12 = (hour24 % 12) if (hour24 % 12) != 0 else 12 %}
+                                <p style="margin: 4px 0 0 0; font-size: 14px; color: #1f2937; font-family: monospace;">{{ hour12 }}:{{ minute }} {{ ampm }} EST</p>
                             </div>
                         {% endif %}
                         <div>

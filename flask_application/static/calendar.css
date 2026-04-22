@@ -111,10 +111,21 @@
   padding-bottom: 1.25rem;
 }
 
+.event-dots {
+  margin-top: 2px;
+  min-height: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+}
+
 .event-dot {
-  font-size: 10px;
-  position: static;
-  line-height: 1;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+  flex: 0 0 8px;
 }
 
 .assignment-count {

@@ -106,6 +106,23 @@
         assignList.innerHTML = '';
         let filtered = window.allAssignments.filter(a => a.due_date && a.due_date.trim() !== '');
 
+        function formatDueTimeEst(timeValue) {
+          if (!timeValue) return null;
+          const raw = String(timeValue).trim();
+          if (!raw) return null;
+
+          const parts = raw.split(':');
+          if (parts.length < 2) return raw;
+
+          const hour24 = parseInt(parts[0], 10);
+          const minute = parts[1].padStart(2, '0');
+          if (Number.isNaN(hour24)) return raw;
+
+          const ampm = hour24 >= 12 ? 'PM' : 'AM';
+          const hour12 = (hour24 % 12) || 12;
+          return `${hour12}:${minute} ${ampm} EST`;
+        }
+
         if (hideAvailableToggle.checked) {
           filtered = filtered.filter(a => !(a.name && a.name.toLowerCase().includes('available')));
         }
@@ -125,6 +142,8 @@
         filtered.forEach(assignment => {
           const p = assignment.priority_level ? parseInt(assignment.priority_level) : 0;
           const tag_color = assignment.color || '#517664';
+          const dueTime = formatDueTimeEst(assignment.due_time);
+          const dueDisplay = dueTime ? `${assignment.due_date} @ ${dueTime}` : assignment.due_date;
           const li = document.createElement('li');
           li.className = 'assign-row';
 
@@ -151,7 +170,7 @@
               </div>
             </div>
             <div class="assign-row-right">
-              <span class="assign-due">${assignment.due_date}</span>
+              <span class="assign-due">${dueDisplay}</span>
               <div class="assign-options-wrap" style="position:relative;">
                 <button class="assign-action-btn" title="Options" onclick="toggleMenu(event, ${assignment.id})">···</button>
                 <div class="assign-dropdown" id="menu-${assignment.id}" style="display:none; position:absolute; right:0; top:100%; background:white; border:1px solid #ddd; border-radius:6px; box-shadow:0 2px 8px rgba(0,0,0,0.12); z-index:100; min-width:130px;">
@@ -404,7 +423,11 @@ document.addEventListener("DOMContentLoaded", function () {
     for (let d = 1; d <= dim; d++) {
       const cell = document.createElement("div");
       cell.className = "mc-day";
-      cell.textContent = d;
+
+      const dayNumber = document.createElement("div");
+      dayNumber.className = "mc-day-number";
+      dayNumber.textContent = d;
+      cell.appendChild(dayNumber);
 
       if (
         d === tod.getDate() &&
@@ -416,9 +439,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
       const key = `${y}-${String(m + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
 
-      if (miniEventsByDate[key]) {
-        cell.style.position = "relative";
+      const dotWrap = document.createElement("div");
+      dotWrap.className = "mc-day-dots";
 
+      if (miniEventsByDate[key]) {
         const courseColors = {};
         miniEventsByDate[key].forEach(evt => {
           const course = evt.course || "uncategorized";
@@ -428,25 +452,15 @@ document.addEventListener("DOMContentLoaded", function () {
         });
 
         const dots = Object.values(courseColors).slice(0, 3);
-
-        const dotWrap = document.createElement("div");
-        dotWrap.style.display = "flex";
-        dotWrap.style.justifyContent = "center";
-        dotWrap.style.gap = "3px";
-        dotWrap.style.marginTop = "2px";
-
         dots.forEach(color => {
           const dot = document.createElement("span");
-          dot.style.display = "inline-block";
-          dot.style.width = "6px";
-          dot.style.height = "6px";
-          dot.style.borderRadius = "50%";
+          dot.className = "mc-day-dot";
           dot.style.background = color;
           dotWrap.appendChild(dot);
         });
-
-        cell.appendChild(dotWrap);
       }
+
+      cell.appendChild(dotWrap);
 
       grid.appendChild(cell);
     }
