@@ -14,7 +14,6 @@ if project_root not in sys.path:
 from flask import Flask, render_template, request, flash, redirect, url_for
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from app.models import db, User, Assignment, CourseColor
-import requests
 from sqlalchemy import text
 from flask_application.sync import sync_assignments
 
