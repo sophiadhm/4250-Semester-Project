@@ -26,9 +26,9 @@
 
                 <div class="assignment-card" style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; margin-bottom: 12px;">
                     <!-- Header with title and type -->
-                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;">
+                    <div class="assignment-card-header" style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;">
                         <div style="flex: 1;">
-                            <h3 style="margin: 0; font-size: 18px; color: #1f2937;">{{ assignment.name }}</h3>
+                            <h3 style="margin: 0; font-size: 18px; color: #1f2937; overflow-wrap: break-word; word-break: break-word;">{{ assignment.name }}</h3>
                             {% if assignment.assignment_type %}
                                 <span style="background: #dbeafe; color: #1e40af; padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: 500; display: inline-block; margin-top: 6px;">{{ assignment.assignment_type }}</span>
                             {% endif %}
@@ -42,7 +42,7 @@
 
                     <!-- Course info -->
                     {% if assignment.course and assignment.course != assignment.name %}
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 12px;">
+                        <div class="assignment-card-course-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 12px;">
                             <div>
                                 <p style="margin: 0; font-size: 12px; color: #6b7280; font-weight: 600;">COURSE</p>
                                 <p style="margin: 4px 0 0 0; font-size: 14px; color: #1f2937;">{{ assignment.course }}</p>
@@ -62,7 +62,7 @@
                     <hr style="margin: 12px 0; border: none; border-top: 1px solid #e5e7eb;">
 
                     <!-- Due date/time, priority, points -->
-                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+                    <div class="assignment-card-meta-grid" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 12px;">
                         <div>
                             <p style="margin: 0; font-size: 12px; color: #6b7280; font-weight: 600;">DUE DATE</p>
                             <p style="margin: 4px 0 0 0; font-size: 14px; color: #1f2937; font-family: monospace;">{{ assignment.due_date }}</p>
@@ -70,7 +70,11 @@
                         {% if assignment.due_time %}
                             <div>
                                 <p style="margin: 0; font-size: 12px; color: #6b7280; font-weight: 600;">DUE TIME</p>
-                                <p style="margin: 4px 0 0 0; font-size: 14px; color: #1f2937; font-family: monospace;">{{ assignment.due_time }}</p>
+                                {% set hour24 = assignment.due_time[0:2] | int %}
+                                {% set minute = assignment.due_time[3:5] %}
+                                {% set ampm = 'PM' if hour24 >= 12 else 'AM' %}
+                                {% set hour12 = (hour24 % 12) if (hour24 % 12) != 0 else 12 %}
+                                <p style="margin: 4px 0 0 0; font-size: 14px; color: #1f2937; font-family: monospace;">{{ hour12 }}:{{ minute }} {{ ampm }} EST</p>
                             </div>
                         {% endif %}
                         <div>

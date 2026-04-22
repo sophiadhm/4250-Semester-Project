@@ -33,6 +33,15 @@ def parse_ics_date(ics_date_str):
     if not raw:
         raise ValueError("Empty DTSTART")
 
+    def parse_compact_datetime(value):
+        """Parse compact ICS datetime value with or without seconds."""
+        compact = value.strip()
+        if len(compact) == 15:
+            return datetime.strptime(compact, "%Y%m%dT%H%M%S")
+        if len(compact) == 13:
+            return datetime.strptime(compact, "%Y%m%dT%H%M")
+        raise ValueError(f"Invalid ICS datetime format: {value}")
+
     # Extract timezone if specified (e.g., TZID=America/New_York)
     tz = None
     if "TZID=" in prefix:
@@ -54,37 +63,37 @@ def parse_ics_date(ics_date_str):
 
     # Process date with time component
     parse_raw = raw
+    source_has_explicit_offset = False
 
     # Convert Z (UTC) suffix to +00:00 format for parsing
     if parse_raw.endswith("Z"):
         parse_raw = parse_raw[:-1] + "+00:00"
+        source_has_explicit_offset = True
 
     # Parse datetime with timezone offset if present
     if "+" in parse_raw[-6:] or "-" in parse_raw[-6:]:
+        source_has_explicit_offset = True
         # datetime with timezone offset
         try:
             dt = datetime.fromisoformat(parse_raw)
         except Exception:
             # Fallback: parse without offset and assume UTC
-            dt = datetime.strptime(parse_raw[:15], "%Y%m%dT%H%M%S").replace(tzinfo=timezone.utc)
+            compact_no_offset = re.sub(r"[+-]\d{2}:?\d{2}$", "", parse_raw)
+            dt = parse_compact_datetime(compact_no_offset).replace(tzinfo=timezone.utc)
     else:
         # No timezone offset in string
-        dt = datetime.strptime(parse_raw[:15], "%Y%m%dT%H%M%S")
+        dt = parse_compact_datetime(parse_raw)
         # Apply timezone if we extracted one earlier
         if tz:
             dt = dt.replace(tzinfo=tz)
-        else:
-            # Default to UTC if no timezone specified
-            dt = dt.replace(tzinfo=timezone.utc)
 
-    # Convert to local timezone to avoid date shift issues
-    if dt.tzinfo is None:
-        dt = dt.replace(tzinfo=timezone.utc)
-    local_dt = dt.astimezone()  # Convert to local timezone for user-facing day
+    # Convert explicit UTC/offset times to local timezone for day display.
+    # Keep TZID/floating times as-is so they don't drift by host timezone.
+    if source_has_explicit_offset and dt.tzinfo is not None:
+        dt = dt.astimezone()
 
-    # Extract date and time in local timezone
-    due_date = local_dt.date().isoformat()
-    due_time = local_dt.time().strftime("%H:%M:%S")
+    due_date = dt.date().isoformat()
+    due_time = dt.time().strftime("%H:%M:%S")
 
     return due_date, due_time
 
@@ -371,14 +380,16 @@ def sync_assignments(user):
         title_line = next((line for line in lines if line.startswith("SUMMARY:")), None)
         title = title_line.replace("SUMMARY:", "").strip() if title_line else "No Title"
 
-        # Extract start date/time (DTSTART or DTEND as fallback)
-        dt_line = next((line for line in lines if line.startswith("DTSTART")), None)
+        # Extract due date/time, preferring DUE when available.
+        # D2L assignment feeds may include DUE that differs from DTSTART.
+        dt_line = next((line for line in lines if line.startswith("DUE")), None)
         if not dt_line:
-            # Try DTEND if DTSTART not found
+            dt_line = next((line for line in lines if line.startswith("DTSTART")), None)
+        if not dt_line:
             dt_line = next((line for line in lines if line.startswith("DTEND")), None)
-            if not dt_line:
-                # No date info, skip this event
-                continue
+        if not dt_line:
+            # No date info, skip this event
+            continue
 
         # Parse the date/time string
         try:
@@ -460,9 +471,6 @@ def sync_assignments(user):
             seen_uids.add(uid)
         else:
             seen_titles.add(title)
-
-        # DEBUG: show parsed assignment data and where it maps
-        print(f"[sync] user={user.username} title={title!r} uid={uid!r} due_date={due_date} due_time={due_time} course_id={course_id}")
 
     # Delete assignments that are no longer in the calendar feed
     # This keeps the database in sync when assignments are removed from calendar

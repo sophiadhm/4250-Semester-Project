@@ -138,6 +138,23 @@ document.addEventListener('DOMContentLoaded', function() {
     return y + '-' + m + '-' + dayStr;
   }
 
+  function formatDueTimeEst(timeValue) {
+    if (!timeValue) return null;
+    var raw = String(timeValue).trim();
+    if (!raw) return null;
+
+    var parts = raw.split(':');
+    if (parts.length < 2) return raw;
+
+    var hour24 = parseInt(parts[0], 10);
+    var minute = parts[1].padStart(2, '0');
+    if (isNaN(hour24)) return raw;
+
+    var ampm = hour24 >= 12 ? 'PM' : 'AM';
+    var hour12 = (hour24 % 12) || 12;
+    return hour12 + ':' + minute + ' ' + ampm + ' EST';
+  }
+
 
   function renderAssignmentList(dateKey) {
     popupAssignmentsContent.innerHTML = '';
@@ -182,7 +199,8 @@ document.addEventListener('DOMContentLoaded', function() {
         ? '<span style="background: #dbeafe; color: #1e40af; padding: 3px 8px; border-radius: 3px; font-size: 12px; font-weight: 500;">' + item.assignment_type + '</span>'
         : '(Not specified)';
 
-      var dueDatetime = (item.due_date || 'N/A') + (item.due_time ? ' @ ' + item.due_time.substring(0, 5) : '');
+      var dueTimeDisplay = formatDueTimeEst(item.due_time);
+      var dueDatetime = (item.due_date || 'N/A') + (dueTimeDisplay ? ' @ ' + dueTimeDisplay : '');
 
       var priorityDisplay = '';
       if (item.priority_level) {
@@ -204,7 +222,7 @@ document.addEventListener('DOMContentLoaded', function() {
         : '';
 
       card.innerHTML =
-        '<div style="font-weight: 600; font-size: 14px; margin-bottom: 8px; color: #1f2937;">' + (item.name || 'Untitled') + '</div>' +
+        '<div style="font-weight: 600; font-size: 14px; margin-bottom: 8px; color: #1f2937; overflow-wrap: break-word; word-break: break-word;">' + (item.name || 'Untitled') + '</div>' +
         '<div style="font-size: 12px; color: #1f2937; margin-bottom: 4px; display: flex; align-items: center; gap: 8px;"><span style="display: inline-block; width: 12px; height: 12px; border-radius: 50%; background: ' + dotColor + '; flex-shrink: 0;"></span><strong>Course:</strong> ' + courseDisplay + '</div>' +
         '<div style="font-size: 12px; color: #1f2937; margin-bottom: 4px;"><strong>Type:</strong> ' + typeTag + '</div>' +
         '<div style="font-size: 12px; color: #1f2937; margin-bottom: 4px;"><strong>Due:</strong> ' + dueDatetime + '</div>' +
@@ -294,20 +312,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Create a flex container for dots
         var dotContainer = document.createElement('div');
-        dotContainer.style.display = 'flex';
-        dotContainer.style.justifyContent = 'center';
-        dotContainer.style.alignItems = 'center';
-        dotContainer.style.gap = '8px';
-        dotContainer.style.marginTop = '2px';
-        dotContainer.style.position = 'relative';
+        dotContainer.className = 'event-dots';
 
         Object.values(courseColors).forEach(function(color) {
           var dot = document.createElement('span');
           dot.className = 'event-dot';
-          dot.textContent = '●';
-          dot.style.color = color;
-          dot.style.position = 'static';
-          dot.style.fontSize = '10px';
+          dot.style.backgroundColor = color;
           dotContainer.appendChild(dot);
         });
         dayBox.appendChild(dotContainer);

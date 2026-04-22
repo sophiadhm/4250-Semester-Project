@@ -111,10 +111,21 @@
   padding-bottom: 1.25rem;
 }
 
+.event-dots {
+  margin-top: 2px;
+  min-height: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+}
+
 .event-dot {
-  font-size: 10px;
-  position: static;
-  line-height: 1;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+  flex: 0 0 8px;
 }
 
 .assignment-count {
@@ -253,4 +264,99 @@
   align-items: center;
   gap: 16px;
   flex-wrap: wrap;
+}
+
+@media (max-width: 900px) {
+  .calendar-center-wrapper {
+    min-height: auto;
+    padding: 0 14px;
+  }
+
+  .calendar {
+    width: 100%;
+    padding: 1.25rem;
+  }
+
+  .calendar-actions {
+    max-width: 100%;
+    padding: 0 14px;
+  }
+}
+
+@media (max-width: 640px) {
+  .calendar {
+    padding: 0.9rem;
+    border-radius: 12px;
+  }
+
+  .cal-header {
+    margin-bottom: 1rem;
+  }
+
+  .cal-title {
+    font-size: 1.15rem;
+    text-align: center;
+  }
+
+  .cal-nav {
+    width: 32px;
+    height: 32px;
+  }
+
+  .cal-grid {
+    gap: 2px;
+  }
+
+  .cal-day-label {
+    font-size: 0.58rem;
+    letter-spacing: 0.05em;
+    padding: 0.3rem 0;
+  }
+
+  .cal-day {
+    font-size: 0.75rem;
+    padding: 0.45rem 0;
+    min-height: 34px;
+  }
+
+  .cal-day.has-event {
+    padding-bottom: 1rem;
+  }
+
+  .event-dots {
+    gap: 4px;
+  }
+
+  .event-dot {
+    width: 6px;
+    height: 6px;
+    flex-basis: 6px;
+  }
+
+  .assignment-count {
+    width: 12px;
+    height: 12px;
+    font-size: 9px;
+  }
+
+  .calendar-actions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .sync-link,
+  .add-assignment-btn {
+    text-align: center;
+  }
+
+  .popup-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .day-popup,
+  .calendar-connect-card {
+    max-width: 100%;
+  }
 }

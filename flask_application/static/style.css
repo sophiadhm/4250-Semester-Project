@@ -79,6 +79,10 @@ body {
   font-size: 15px;
 }
 
+img {
+  max-width: 100%;
+}
+
 .page-content {
   flex: 1;
   width: 100%;
@@ -271,17 +275,45 @@ a { color: inherit; text-decoration: none; }
 
 .mc-day {
   text-align: center;
-  padding: 4px 0;
+  padding: 3px 0;
   border-radius: 4px;
   font-size: 0.72rem;
   font-weight: 500;
   cursor: pointer;
   color: var(--text);
   transition: background 0.1s;
+  min-height: 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
 }
 .mc-day:hover { background: var(--hover); }
 .mc-day.empty { cursor: default; pointer-events: none; }
 .mc-day.mc-today { background: var(--c-teal); color: #fff; font-weight: 700; }
+
+.mc-day-number {
+  min-height: 12px;
+  display: flex;
+  align-items: center;
+  line-height: 1.1;
+}
+
+.mc-day-dots {
+  min-height: 6px;
+  margin-top: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+}
+
+.mc-day-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  display: inline-block;
+}
 
 /* Pomodoro */
 .pomodoro {
@@ -521,6 +553,223 @@ a { color: inherit; text-decoration: none; }
   .dashboard { grid-template-columns: 1fr; }
   .dash-sidebar { min-height: auto; border-right: none; border-bottom: 1px solid var(--border); }
   .dash-main { padding: 24px 20px; }
+}
+
+@media (max-width: 900px) {
+  body {
+    padding-top: 108px;
+  }
+
+  .navbar-container {
+    height: auto;
+    min-height: 56px;
+    padding: 10px 16px;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+  }
+
+  .navbar-left {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .navbar-brand {
+    font-size: 0.92rem;
+    text-align: center;
+  }
+
+  .icon-img {
+    width: 34px;
+    height: 34px;
+  }
+
+  .navbar-menu {
+    width: 100%;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .heading-container,
+  .assignments-section {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  .page-title {
+    font-size: 1.75rem;
+  }
+
+  .account-container {
+    padding: 24px 16px 40px;
+  }
+
+  .account-card {
+    padding: 24px 18px;
+  }
+
+  .site-footer {
+    padding: 18px 0;
+  }
+
+  .footer-container,
+  .footer-center {
+    justify-content: center;
+  }
+
+  .footer-container {
+    flex-direction: column;
+    text-align: center;
+  }
+}
+
+@media (max-width: 768px) {
+  .widget-card {
+    padding: 14px;
+  }
+
+  .dash-sidebar {
+    padding: 18px 14px;
+  }
+
+  .dash-main {
+    padding: 20px 14px;
+  }
+
+  .dash-main-header {
+    align-items: flex-start;
+    gap: 14px;
+  }
+
+  .dash-title {
+    font-size: 1.35rem;
+  }
+
+  .assign-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    padding: 12px 8px;
+  }
+
+  .assign-row-right {
+    width: 100%;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .assign-due {
+    white-space: normal;
+  }
+
+  .assign-action-btn {
+    opacity: 1;
+  }
+
+  .field-row,
+  .priority-picker,
+  .modal-footer {
+    flex-direction: column;
+  }
+
+  .color-group {
+    width: 100%;
+  }
+
+  .pri-option,
+  .cancel-btn,
+  .submit-btn {
+    width: 100%;
+  }
+
+  .modal {
+    max-width: calc(100% - 20px);
+    padding: 20px 16px 18px;
+    max-height: calc(100vh - 24px);
+    overflow-y: auto;
+  }
+
+  .assignments-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+@media (max-width: 560px) {
+  body {
+    padding-top: 120px;
+  }
+
+  .navbar-container {
+    padding: 8px 12px 10px;
+  }
+
+  .navbar-brand {
+    font-size: 0.84rem;
+    line-height: 1.25;
+  }
+
+  .navbar-menu a {
+    font-size: 0.8rem;
+    padding: 4px 8px;
+  }
+
+  .page-title {
+    font-size: 1.5rem;
+  }
+
+  .heading-container {
+    margin-top: 28px;
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  .assignments-section {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  .assignment-card {
+    padding: 12px;
+  }
+
+  .assignment-card-header {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .assignment-card-header > div:last-child {
+    text-align: left !important;
+  }
+
+  .assignment-card-course-grid,
+  .assignment-card-meta-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .account-card {
+    padding: 20px 14px;
+  }
+
+  .account-form > div[style*="flex-direction: column"] > div[style*="display: flex"] {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 10px !important;
+  }
+
+  #pomodoroWidget.fullscreen {
+    padding: 16px;
+  }
+
+  #pomodoroWidget.fullscreen .pomodoro {
+    transform: none;
+    width: 100%;
+  }
+
+  .footer-center {
+    flex-wrap: wrap;
+  }
 }
 
 /* =========================
@@ -855,6 +1104,12 @@ a { color: inherit; text-decoration: none; }
 .course-tag {
   font-size: 0.7rem; font-weight: 600; padding: 2px 9px;
   border-radius: 999px; border: 1px solid; display: inline-block;
+}
+
+.assignment-card-header,
+.assignment-card-course-grid,
+.assignment-card-meta-grid {
+  min-width: 0;
 }
 
 /* Account */
