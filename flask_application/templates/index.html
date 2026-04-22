@@ -289,23 +289,34 @@ document.addEventListener("DOMContentLoaded", function () {
     if (e.target === overlay) overlay.classList.add("hidden");
   });
 
-  // ── Tag preview ──
-  const colorInput = document.getElementById("class_color");
-  const courseInput = document.getElementById("course");
-  const tagPreview = document.getElementById("tagPreview");
+ // ── Tag preview ──
+const colorInput = document.getElementById("class_color");
+const courseInput = document.getElementById("course");
+const tagPreview = document.getElementById("tagPreview");
 
-  function updateTagPreview() {
-    const color = colorInput.value;
-    const name = courseInput.value.trim() || "Course Tag";
-    tagPreview.textContent = name;
-    tagPreview.style.borderColor = color;
-    tagPreview.style.color = color;
-    tagPreview.style.backgroundColor = color + "18";
-  }
+function updateTagPreview() {
+  const color = colorInput.value;
+  const name = courseInput.value.trim() || "Course Tag";
+  tagPreview.textContent = name;
+  tagPreview.style.borderColor = color;
+  tagPreview.style.color = color;
+  tagPreview.style.backgroundColor = color + "18";
+}
 
-  colorInput.addEventListener("input", updateTagPreview);
-  courseInput.addEventListener("input", updateTagPreview);
+colorInput.addEventListener("input", updateTagPreview);
+
+courseInput.addEventListener("input", function () {
+  const courseName = courseInput.value.trim().toLowerCase();
+
+  const match = (window.allAssignments || []).find(
+    a => a.course && a.course.trim().toLowerCase() === courseName
+  );
+
+  colorInput.value = (match && match.color) ? match.color : "#517664";
   updateTagPreview();
+});
+
+updateTagPreview();
 
   // ── Priority picker ──
   const priInput = document.getElementById("priority");

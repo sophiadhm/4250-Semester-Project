@@ -13,7 +13,7 @@ if project_root not in sys.path:
 
 from flask import Flask, render_template, request, flash, redirect, url_for
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
-from app.models import db, User, Assignment
+from app.models import db, User, Assignment, CourseColor
 import requests
 from sqlalchemy import text
 from flask_application.sync import sync_assignments
@@ -250,7 +250,25 @@ def new_assignment():
         "points": None,  # Not provided in this form
         "color": request.form.get("class_color") or "#517664"  # Course color from form
     }
+    course = data["course"]
+    color = data["color"]
 
+    if course:
+        existing = CourseColor.query.filter_by(
+            user_id=current_user.id,
+            course=course
+        ).first()
+
+        if existing:
+            existing.color = color
+        else:
+            db.session.add(CourseColor(
+                user_id=current_user.id,
+                course=course,
+                color=color
+            ))
+
+        db.session.commit()
     # Send POST request to FastAPI backend to create assignment
     requests.post("http://127.0.0.1:8000/assignments/", json=data)
     # Redirect to home page to show new assignment

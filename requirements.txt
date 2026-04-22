@@ -15,3 +15,4 @@ decorators
 icalendar
 pytest
 httpx
+gunicorn
