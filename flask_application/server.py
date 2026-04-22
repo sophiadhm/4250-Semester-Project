@@ -269,9 +269,22 @@ def new_assignment():
             ))
 
         db.session.commit()
-        
-    # Send POST request to FastAPI backend to create assignment
-    requests.post("http://127.0.0.1:8000/assignments/", json=data)
+
+    # Create assignment directly in the database
+    new = Assignment(
+        user_id=data["user_id"],
+        name=data["name"],
+        course=data["course"],
+        due_date=data["due_date"],
+        priority_level=data["priority_level"],
+        course_id=data["course_id"],
+        due_time=data["due_time"],
+        assignment_type=data["assignment_type"],
+        points=data["points"],
+        color=data["color"],
+    )
+    db.session.add(new)
+    db.session.commit()
     # Redirect to home page to show new assignment
     return redirect(url_for("index"))
 
