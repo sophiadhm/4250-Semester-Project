@@ -534,12 +534,49 @@ def logout():
 @app.route('/')
 @login_required  # Require user to be logged in
 def index():
-    # Query all assignments for current user, sorted by due date, only today or future
-    today = date.today()
-    assignments = Assignment.query.filter(
-        Assignment.user_id == current_user.id,
-        Assignment.due_date >= today
-    ).order_by(Assignment.due_date).all()
+    # Query all assignments for current user and normalize/filter in Python
+    today_iso = date.today().isoformat()
+    raw_assignments = Assignment.query.filter(
+        Assignment.user_id == current_user.id
+    ).all()
+
+    def normalize_date(due_date):
+        if due_date is None:
+            return None
+        due_date_str = str(due_date).strip()
+        if not due_date_str:
+            return None
+        try:
+            patterns = [
+                '%Y-%m-%d',
+                '%m/%d/%Y',
+                '%m-%d-%Y',
+                '%Y/%m/%d',
+                '%d/%m/%Y',
+                '%d-%m-%Y',
+            ]
+            for fmt in patterns:
+                try:
+                    return datetime.strptime(due_date_str, fmt).strftime('%Y-%m-%d')
+                except ValueError:
+                    continue
+            if len(due_date_str) >= 10 and due_date_str[4] == '-' and due_date_str[7] == '-':
+                return due_date_str[:10]
+            return None
+        except Exception:
+            return None
+
+    assignments = []
+    for assignment in raw_assignments:
+        normalized_due_date = normalize_date(assignment.due_date)
+        if not normalized_due_date:
+            continue
+        if normalized_due_date < today_iso:
+            continue
+        assignment._normalized_due_date = normalized_due_date
+        assignments.append(assignment)
+
+    assignments.sort(key=lambda a: ((a._normalized_due_date or ''), (a.due_time or '')))
     # Get course color mapping
     from app.models import CourseColor
     course_colors = {c.course: c.color for c in CourseColor.query.filter_by(user_id=current_user.id).all()}
@@ -550,7 +587,7 @@ def index():
         return {
             "id": a.id,
             "name": a.name,
-            "due_date": a.due_date,
+            "due_date": getattr(a, "_normalized_due_date", a.due_date),
             "due_time": a.due_time,
             "course": a.course,
             "course_id": a.course_id,
@@ -802,12 +839,20 @@ def pending_notifications():
 def test_notifications():
     test_body = "• Test Assignment 1 (CS 101)\n• Test Assignment 2 (MATH 201)\n• Test Assignment 3 (CS 101)"
     test_title = "You have 3 assignments due today"
-    _send_windows_notification(test_title, test_body)
-    _send_web_push_to_user(current_user.id, test_title, test_body)
+    windows_sent = _send_windows_notification(test_title, test_body)
+    web_push_sent_count = _send_web_push_to_user(current_user.id, test_title, test_body)
+    subscription_count = PushSubscription.query.filter_by(user_id=current_user.id).count()
+
     return jsonify({
         "ok": True,
         "title": test_title,
         "body": test_body,
+        "channels": {
+            "windows_local_fallback_sent": windows_sent,
+            "web_push_enabled": _web_push_enabled(),
+            "web_push_sent_count": web_push_sent_count,
+            "push_subscription_count": subscription_count,
+        },
     })
 
 

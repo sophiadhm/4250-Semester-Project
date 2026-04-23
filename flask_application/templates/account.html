@@ -260,12 +260,23 @@ document.addEventListener('DOMContentLoaded', function() {
                     data.body || 'This is a test browser reminder from Calendrier.'
                 );
                 console.log('[Test] Second notification shown');
+
+                if (data.channels) {
+                    console.log('[Test] Backend channel diagnostics:', data.channels);
+                }
                 
                 if (window.__showInAppToast) {
                     window.__showInAppToast(data.body || 'This is a test browser reminder from Calendrier.');
                 }
-                
-                setStatus('✅ Notifications sent! Check your screen or notification area.', false);
+
+                let statusMessage = '✅ Notifications sent! Check your screen or notification area.';
+                if (data.channels) {
+                    statusMessage += ` Push enabled: ${data.channels.web_push_enabled ? 'yes' : 'no'}.`;
+                    statusMessage += ` Push sent: ${data.channels.web_push_sent_count || 0}.`;
+                    statusMessage += ` Subscriptions: ${data.channels.push_subscription_count || 0}.`;
+                }
+
+                setStatus(statusMessage, false);
             } catch (err) {
                 console.error('[Test] Error:', err);
                 setStatus('❌ Error: ' + (err.message || 'Browser notification test failed.'), true);
