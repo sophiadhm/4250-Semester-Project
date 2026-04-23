@@ -107,8 +107,10 @@ def _init_vapid_keys():
 
     try:
         instance_dir = os.path.join(BASE_DIR, "instance")
-        os.makedirs(instance_dir, exist_ok=True)
         auto_private_path = os.path.join(instance_dir, "vapid_private.pem")
+
+        auto_private = ""
+        auto_public = ""
 
         if os.path.exists(auto_private_path):
             with open(auto_private_path, "r", encoding="utf-8") as file_obj:
@@ -123,17 +125,49 @@ def _init_vapid_keys():
                 format=serialization.PublicFormat.UncompressedPoint,
             )
             auto_public = base64.urlsafe_b64encode(public_raw).decode().rstrip("=")
-            with open(auto_private_path, "w", encoding="utf-8") as file_obj:
-                file_obj.write(auto_private)
+
+            # Best-effort persistence; if this fails (read-only filesystem),
+            # keep keys in memory so push still works for current process.
+            try:
+                os.makedirs(instance_dir, exist_ok=True)
+                with open(auto_private_path, "w", encoding="utf-8") as file_obj:
+                    file_obj.write(auto_private)
+            except Exception as exc:
+                print(f"[WARN] Could not persist VAPID private key file; using in-memory key: {exc}")
 
         if auto_private and auto_public:
             VAPID_PRIVATE_KEY = auto_private
             VAPID_PUBLIC_KEY = auto_public
-            if not VAPID_PRIVATE_KEY_PATH:
+            if not VAPID_PRIVATE_KEY_PATH and os.path.exists(auto_private_path):
                 VAPID_PRIVATE_KEY_PATH = auto_private_path
-            print(f"[INFO] Web push keys ready. Public key loaded; private key at {VAPID_PRIVATE_KEY_PATH}")
+            print("[INFO] Web push keys ready.")
     except Exception as exc:
         print(f"[WARN] Could not initialize VAPID keys automatically: {exc}")
+
+
+def _web_push_status():
+    private_key = _get_vapid_private_key()
+    status = {
+        "webpush_imported": webpush is not None,
+        "py_vapid_imported": Vapid is not None and serialization is not None,
+        "public_key_loaded": bool(VAPID_PUBLIC_KEY),
+        "private_key_loaded": bool(private_key),
+        "enabled": False,
+        "reason": "",
+    }
+
+    if not status["webpush_imported"]:
+        status["reason"] = "pywebpush import failed"
+    elif not status["py_vapid_imported"] and not (status["public_key_loaded"] and status["private_key_loaded"]):
+        status["reason"] = "py_vapid/cryptography unavailable and no preconfigured keys"
+    elif not status["public_key_loaded"]:
+        status["reason"] = "VAPID public key missing"
+    elif not status["private_key_loaded"]:
+        status["reason"] = "VAPID private key missing"
+    else:
+        status["enabled"] = True
+
+    return status
 
 
 _init_vapid_keys()
@@ -231,7 +265,7 @@ def _send_windows_notification(title, body):
 
 
 def _web_push_enabled():
-    return bool(VAPID_PUBLIC_KEY and _get_vapid_private_key() and webpush is not None)
+    return _web_push_status()["enabled"]
 
 
 def _get_vapid_private_key():
@@ -928,6 +962,7 @@ def test_notifications():
     test_body = "• Test Assignment 1 (CS 101)\n• Test Assignment 2 (MATH 201)\n• Test Assignment 3 (CS 101)"
     test_title = "You have 3 assignments due today"
     windows_sent = _send_windows_notification(test_title, test_body)
+    push_status = _web_push_status()
     web_push_sent_count = _send_web_push_to_user(current_user.id, test_title, test_body)
     subscription_count = PushSubscription.query.filter_by(user_id=current_user.id).count()
 
@@ -937,9 +972,16 @@ def test_notifications():
         "body": test_body,
         "channels": {
             "windows_local_fallback_sent": windows_sent,
-            "web_push_enabled": _web_push_enabled(),
+            "web_push_enabled": push_status["enabled"],
             "web_push_sent_count": web_push_sent_count,
             "push_subscription_count": subscription_count,
+            "web_push_reason": push_status["reason"],
+            "web_push_debug": {
+                "webpush_imported": push_status["webpush_imported"],
+                "py_vapid_imported": push_status["py_vapid_imported"],
+                "public_key_loaded": push_status["public_key_loaded"],
+                "private_key_loaded": push_status["private_key_loaded"],
+            },
         },
     })
 
