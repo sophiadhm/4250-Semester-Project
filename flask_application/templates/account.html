@@ -247,6 +247,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     return;
                 }
 
+                if (typeof window.__ensurePushSubscription === 'function') {
+                    await window.__ensurePushSubscription();
+                }
+
                 console.log('[Test] Creating first test notification...');
                 showSystemNotification(
                     'Browser notifications enabled',
@@ -274,6 +278,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     statusMessage += ` Push enabled: ${data.channels.web_push_enabled ? 'yes' : 'no'}.`;
                     statusMessage += ` Push sent: ${data.channels.web_push_sent_count || 0}.`;
                     statusMessage += ` Subscriptions: ${data.channels.push_subscription_count || 0}.`;
+                    if (data.channels.web_push_reason) {
+                        statusMessage += ` Reason: ${data.channels.web_push_reason}.`;
+                    }
                 }
 
                 setStatus(statusMessage, false);

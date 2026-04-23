@@ -161,6 +161,8 @@
             }
         }
 
+        window.__ensurePushSubscription = ensurePushSubscription;
+
         // Request notification permission upfront
         if (Notification.permission === 'default') {
             console.log('[App] Requesting notification permission...');

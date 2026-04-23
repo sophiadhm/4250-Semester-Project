@@ -246,6 +246,38 @@ def _assignment_due_datetime(assignment):
     return datetime.combine(due_day, due_time_obj)
 
 
+def _normalize_due_date_to_date(due_date_value):
+    if due_date_value is None:
+        return None
+
+    raw_value = str(due_date_value).strip()
+    if not raw_value:
+        return None
+
+    patterns = [
+        "%Y-%m-%d",
+        "%m/%d/%Y",
+        "%m-%d-%Y",
+        "%Y/%m/%d",
+        "%d/%m/%Y",
+        "%d-%m-%Y",
+    ]
+
+    for pattern in patterns:
+        try:
+            return datetime.strptime(raw_value, pattern).date()
+        except ValueError:
+            continue
+
+    if len(raw_value) >= 10 and raw_value[4] == "-" and raw_value[7] == "-":
+        try:
+            return datetime.strptime(raw_value[:10], "%Y-%m-%d").date()
+        except ValueError:
+            return None
+
+    return None
+
+
 def _send_windows_notification(title, body):
     if os.name != "nt" or plyer_notification is None:
         return False
@@ -330,21 +362,22 @@ def _send_web_push_to_user(user_id, title, body):
     return sent_count
 
 
-def _build_daily_summary_for_user(user, now):
-    if not user.notify_browser_enabled:
+def _build_daily_summary_for_user(user, now, ignore_sent_log=False, ignore_user_pref=False):
+    if (not ignore_user_pref) and (not user.notify_browser_enabled):
         return None, None
 
     today_start = datetime.combine(now.date(), datetime.min.time())
     tomorrow_start = today_start + timedelta(days=1)
 
-    existing_daily = NotificationLog.query.filter(
-        NotificationLog.user_id == user.id,
-        NotificationLog.channel == "daily",
-        NotificationLog.sent_at >= today_start,
-        NotificationLog.sent_at < tomorrow_start,
-    ).first()
-    if existing_daily:
-        return None, None
+    if not ignore_sent_log:
+        existing_daily = NotificationLog.query.filter(
+            NotificationLog.user_id == user.id,
+            NotificationLog.channel == "daily",
+            NotificationLog.sent_at >= today_start,
+            NotificationLog.sent_at < tomorrow_start,
+        ).first()
+        if existing_daily:
+            return None, None
 
     assignments_due_today = []
     assignments = Assignment.query.filter(
@@ -355,9 +388,8 @@ def _build_daily_summary_for_user(user, now):
     for assignment in assignments:
         if _is_available_event(assignment):
             continue
-        try:
-            due_date = datetime.strptime(str(assignment.due_date), "%Y-%m-%d").date()
-        except ValueError:
+        due_date = _normalize_due_date_to_date(assignment.due_date)
+        if not due_date:
             continue
         if due_date == now.date():
             assignments_due_today.append(assignment)
@@ -959,8 +991,20 @@ def pending_notifications():
 @app.route("/api/notifications/test", methods=["POST"])
 @login_required
 def test_notifications():
-    test_body = "• Test Assignment 1 (CS 101)\n• Test Assignment 2 (MATH 201)\n• Test Assignment 3 (CS 101)"
-    test_title = "You have 3 assignments due today"
+    notification, _ = _build_daily_summary_for_user(
+        current_user,
+        datetime.now(),
+        ignore_sent_log=True,
+        ignore_user_pref=True,
+    )
+
+    if notification:
+        test_title = notification.get("title") or "Assignments due today"
+        test_body = notification.get("body") or ""
+    else:
+        test_title = "You have 0 assignments due today"
+        test_body = "No assignments due today."
+
     windows_sent = _send_windows_notification(test_title, test_body)
     push_status = _web_push_status()
     web_push_sent_count = _send_web_push_to_user(current_user.id, test_title, test_body)
@@ -970,6 +1014,8 @@ def test_notifications():
         "ok": True,
         "title": test_title,
         "body": test_body,
+        "is_real_today_summary": bool(notification),
+        "assignment_count_today": len(notification.get("assignments", [])) if notification else 0,
         "channels": {
             "windows_local_fallback_sent": windows_sent,
             "web_push_enabled": push_status["enabled"],
