@@ -17,6 +17,7 @@ from app.models import db, User, Assignment, CourseColor, NotificationLog, PushS
 from sqlalchemy import text
 from flask_application.sync import sync_assignments
 from datetime import date, datetime, timedelta
+from zoneinfo import ZoneInfo
 import threading
 import time
 import json
@@ -49,6 +50,12 @@ VAPID_PUBLIC_KEY = os.environ.get("VAPID_PUBLIC_KEY", "").strip()
 VAPID_PRIVATE_KEY = os.environ.get("VAPID_PRIVATE_KEY", "").strip()
 VAPID_PRIVATE_KEY_PATH = os.environ.get("VAPID_PRIVATE_KEY_PATH", "").strip()
 VAPID_SUBJECT = os.environ.get("VAPID_SUBJECT", "mailto:admin@example.com").strip()
+APP_TIMEZONE_NAME = os.environ.get("APP_TIMEZONE", "America/New_York").strip() or "America/New_York"
+
+try:
+    APP_TIMEZONE = ZoneInfo(APP_TIMEZONE_NAME)
+except Exception:
+    APP_TIMEZONE = ZoneInfo("UTC")
 
 # FastAPI backend server URL for making requests to assignment API
 URL = 'http://127.0.0.1:8000'
@@ -171,6 +178,10 @@ def _web_push_status():
 
 
 _init_vapid_keys()
+
+
+def _now_local():
+    return datetime.now(APP_TIMEZONE)
 # SQLAlchemy configuration for SQLite database
 app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{os.path.join(BASE_DIR, 'users.db')}"
 # Disable automatic tracking of modifications (improves performance)
@@ -458,10 +469,11 @@ def _hourly_ics_sync():
                 users_with_ics = User.query.filter(User.ics_url.isnot(None)).all()
                 for user in users_with_ics:
                     sync_assignments(user)
-                    notification, assignment_id = _build_daily_summary_for_user(user, datetime.now())
+                    now_local = _now_local()
+                    notification, assignment_id = _build_daily_summary_for_user(user, now_local)
                     if notification and assignment_id:
                         _send_web_push_to_user(user.id, notification["title"], notification["body"])
-                        _record_daily_notification_sent(user.id, assignment_id, datetime.now())
+                        _record_daily_notification_sent(user.id, assignment_id, now_local)
                 print(f"[INFO] Hourly ICS sync complete for {len(users_with_ics)} users")
         except Exception as exc:
             print(f"[WARN] Hourly ICS sync failed: {exc}")
@@ -689,7 +701,7 @@ def logout():
 @login_required  # Require user to be logged in
 def index():
     # Query all assignments for current user and normalize/filter in Python
-    today_iso = date.today().isoformat()
+    today_iso = _now_local().date().isoformat()
     raw_assignments = Assignment.query.filter(
         Assignment.user_id == current_user.id
     ).all()
@@ -978,13 +990,14 @@ def assignment():
 @app.route("/api/notifications/pending")
 @login_required
 def pending_notifications():
-    notification, assignment_id = _build_daily_summary_for_user(current_user, datetime.now())
+    now_local = _now_local()
+    notification, assignment_id = _build_daily_summary_for_user(current_user, now_local)
     if not notification or not assignment_id:
         return jsonify([])
 
     _send_windows_notification(notification["title"], notification["body"])
     _send_web_push_to_user(current_user.id, notification["title"], notification["body"])
-    _record_daily_notification_sent(current_user.id, assignment_id, datetime.now())
+    _record_daily_notification_sent(current_user.id, assignment_id, now_local)
     return jsonify([notification])
 
 
@@ -993,7 +1006,7 @@ def pending_notifications():
 def test_notifications():
     notification, _ = _build_daily_summary_for_user(
         current_user,
-        datetime.now(),
+        _now_local(),
         ignore_sent_log=True,
         ignore_user_pref=True,
     )
